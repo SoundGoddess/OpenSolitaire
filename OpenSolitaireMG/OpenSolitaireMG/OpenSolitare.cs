@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace OpenSolitaireMG {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game {
+    public class OpenSolitare : Game {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1() {
+        public OpenSolitare() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -24,7 +25,47 @@ namespace OpenSolitaireMG {
         protected override void Initialize() {
             // TODO: Add your initialization logic here
 
-            base.Initialize();
+            Deck deck = new Deck();
+
+            Console.WriteLine("===\ninitial deck");
+            deck.testDeck(5);
+            deck.debugDeck();
+
+            Console.WriteLine("===\ninitial hand");
+            Deck hand = new Deck();
+            hand.testDeck(2);
+            hand.debugDeck();
+
+            Card moveCard = deck.drawCard();
+            hand.addCard(moveCard);
+
+            Console.WriteLine("===\nnew deck");
+            deck.debugDeck();
+
+            Console.WriteLine("===\nnew hand");
+            hand.debugDeck();
+
+            moveCard = deck.drawCard();
+            hand.addCard(moveCard);
+
+            Console.WriteLine("===\nnew deck");
+            deck.debugDeck();
+
+            Console.WriteLine("===\nnew hand");
+            hand.debugDeck();
+
+
+            moveCard = deck.drawCard();
+            moveCard.flipCard();
+            hand.addCard(moveCard);
+
+            Console.WriteLine("===\nnew deck");
+            deck.debugDeck();
+
+            Console.WriteLine("===\nnew hand");
+            hand.debugDeck();
+
+
         }
 
         /// <summary>
