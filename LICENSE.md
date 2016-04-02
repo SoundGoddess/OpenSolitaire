@@ -1,10 +1,12 @@
 ###Source Code: 
-[GPL 3](http://www.gnu.org/licenses/)
+[GPL 3](http://www.gnu.org/licenses/gpl-3.0.html)
 
 
 ###Card PNG Assets:
 Public Domain
 
+###Audio Assets:
+Public Domain (special thanks to sonniss.com)
 
 ###Music: 
 
@@ -23,5 +25,5 @@ Public Domain
 
 * you're selling a video game
 * you're earning ad revenue from your youtube videos
-* you want to add my songs to some DLC pack)
+* you want to add my songs to some DLC pack
 
