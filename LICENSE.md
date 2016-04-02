@@ -3,10 +3,10 @@
 
 
 ###Card PNG Assets:
-Public Domain
+Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
 
 ###Audio Assets:
-Public Domain (special thanks to sonniss.com)
+Public Domain (mostly from [sonniss.com](sonniss.com))
 
 ###Music: 
 
