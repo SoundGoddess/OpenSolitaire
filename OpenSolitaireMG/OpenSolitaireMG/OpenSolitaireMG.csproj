@@ -70,6 +70,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Deck.cs" />
+    <Compile Include="DragAndDropController.cs" />
+    <Compile Include="IDragAndDropItem.cs" />
+    <Compile Include="Item.cs" />
     <Compile Include="OpenSolitare.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

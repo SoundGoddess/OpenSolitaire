@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* ©2016 Hathor Gaia 
+ * http://HathorsLove.com
+ * 
+ * Licensed Under GNU GPL 3:
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +36,6 @@ namespace OpenSolitaireMG {
         public char[] ranks = {
 
             'A',
-            '1',
             '2',
             '3',
             '4',
@@ -120,7 +127,7 @@ namespace OpenSolitaireMG {
 
                 }
 
-                location = "assets/" + location + "_of_" + suit + ".png";
+                location = "assets/" + location + "_of_" + suit;
 
                 return location;
 

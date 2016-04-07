@@ -1,7 +1,15 @@
-﻿using Microsoft.Xna.Framework;
+﻿/* ©2016 Hathor Gaia 
+ * http://HathorsLove.com
+ * 
+ * Licensed Under GNU GPL 3:
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace OpenSolitaireMG {
     /// <summary>
@@ -10,11 +18,60 @@ namespace OpenSolitaireMG {
     public class OpenSolitare : Game {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        
+        const int WindowWidth = 1024;
+        const int WindowHeight = 768;
+
+        const float cardRatio = 1.452f;
+
+        int spacer, cardWidth, cardHeight;
+
+        Card card0;
+        Card card1;
+
+        Texture2D card0tex;
+        Texture2D card1tex;
+        Texture2D cardSlotTex;
+        Texture2D cardBackTex;
+
+        Rectangle card0rect;
+        Rectangle card1rect;
+
+        List<Rectangle> cardSlot = new List<Rectangle>();
+
+
+        private SpriteBatch _spriteBatch;
+        private DragAndDropController<Item> _dragDropController;
+
 
         public OpenSolitare() {
             graphics = new GraphicsDeviceManager(this);
+
+            // set the screen resolution
+            graphics.PreferredBackBufferWidth = WindowWidth;
+            graphics.PreferredBackBufferHeight = WindowHeight;
+
+            this.Window.AllowUserResizing = true;
+            IsMouseVisible = true;
+
             Content.RootDirectory = "Content";
+
+            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
+
+
+            _setSize();
         }
+
+        void Window_ClientSizeChanged(object sender, EventArgs e) { _setSize(); }
+
+        private void _setSize() {
+            spacer = Window.ClientBounds.Width / 90;
+            cardWidth = (Window.ClientBounds.Width / 7) - spacer;
+
+            float cardHeightF = (float)cardWidth * cardRatio;
+            cardHeight = (int)cardHeightF;
+            
+       }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -23,49 +80,20 @@ namespace OpenSolitaireMG {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            // TODO: Add your initialization logic here
+
 
             Deck deck = new Deck();
+            deck.freshDeck();
+            deck.shuffle();
 
-            Console.WriteLine("===\ninitial deck");
-            deck.testDeck(5);
-            deck.debugDeck();
-
-            Console.WriteLine("===\ninitial hand");
-            Deck hand = new Deck();
-            hand.testDeck(2);
-            hand.debugDeck();
-
-            Card moveCard = deck.drawCard();
-            hand.addCard(moveCard);
-
-            Console.WriteLine("===\nnew deck");
-            deck.debugDeck();
-
-            Console.WriteLine("===\nnew hand");
-            hand.debugDeck();
-
-            moveCard = deck.drawCard();
-            hand.addCard(moveCard);
-
-            Console.WriteLine("===\nnew deck");
-            deck.debugDeck();
-
-            Console.WriteLine("===\nnew hand");
-            hand.debugDeck();
+            card0 = deck.drawCard();
+            card1 = deck.drawCard();
 
 
-            moveCard = deck.drawCard();
-            moveCard.flipCard();
-            hand.addCard(moveCard);
+                        
 
-            Console.WriteLine("===\nnew deck");
-            deck.debugDeck();
-
-            Console.WriteLine("===\nnew hand");
-            hand.debugDeck();
-
-
+            //don't accidentally delete this :O
+            base.Initialize();
         }
 
         /// <summary>
@@ -75,8 +103,42 @@ namespace OpenSolitaireMG {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+
+            _dragDropController = new DragAndDropController<Item>(this, _spriteBatch);
+            Components.Add(_dragDropController);
+
+
+            cardSlotTex = Content.Load<Texture2D>("assets/cardslot2");
+            cardBackTex = Content.Load<Texture2D>("assets/back_purple");
+            card0tex = Content.Load<Texture2D>(card0.asset);
+            card1tex = Content.Load<Texture2D>(card1.asset);
+
+            
+            SetupDraggableItems();
+
+
+            for (int i = 0; i < 7; i++) {
+                
+                cardSlot.Add(new Rectangle());
+            }
+
+
+        }
+
+        private void SetupDraggableItems() {
+
+            _dragDropController.Clear();
+                        
+            for (int i = 0; i < 7; i++) {
+
+                int x = (i * (cardWidth + spacer)) + (spacer / 2);
+                int y = 10;
+
+                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), cardWidth, cardHeight);
+                _dragDropController.Add(item);
+            }
         }
 
         /// <summary>
@@ -98,6 +160,56 @@ namespace OpenSolitaireMG {
 
             // TODO: Add your update logic here
 
+            //card0rect = new Rectangle(150, 100, cardWidth, cardHeight);
+            //card1rect = new Rectangle(300, 100, cardWidth, cardHeight);
+
+            for (int i = 0; i < 7; i++) {
+
+                int x = (i * (cardWidth + spacer)) + (spacer / 2);
+                int y = 10;
+
+                cardSlot[i] = new Rectangle(x, y, cardWidth, cardHeight);
+            }
+
+
+            /*
+            MouseState mouse = Mouse.GetState();
+            var mousePos = new Point(mouse.X, mouse.Y);
+
+            //drawRectangle.X = mouse.X - currentCharacter.Width / 2;
+            //drawRectangle.Y = mouse.Y - currentCharacter.Height / 2;
+
+            if (mouse.LeftButton == ButtonState.Pressed) {
+
+                Console.WriteLine(mouse.X + "," + mouse.Y);
+
+
+                /*
+                if (card0rect.Contains(mousePos)) {
+
+                    card0rect.X = mouse.X - card0rect.Width/2;
+                    card0rect.Y = mouse.Y - card0rect.Height/2;
+
+                }*/
+                /*
+                //int deltaX = card0rect.X - mouse.X;
+                int deltaX = mouse.X - card1rect.X - (card1rect.Width / 2);
+                int deltaY = mouse.Y - card1rect.Y - (card1rect.Height / 2);
+
+                if (card1rect.Contains(mousePos)) {
+
+                    card1rect.X = mouse.X - (card1rect.Width / 2);
+                    card1rect.Y = mouse.Y - (card1rect.Height / 2);
+
+                    Console.WriteLine("mouse:" + mouse.X + "," + mouse.Y);
+                    Console.WriteLine("card:" + card1rect.X + "," + card1rect.Y);
+                    Console.WriteLine("delta:" + deltaX + "," + deltaY);
+
+                }
+                
+            }
+            */
+
             base.Update(gameTime);
         }
 
@@ -109,6 +221,35 @@ namespace OpenSolitaireMG {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+
+            Console.WriteLine(Window.ClientBounds.Width + "," + Window.ClientBounds.Height);
+
+
+
+            // z-index is determined by the order which the spriteBatch.Draw methods are called
+
+            spriteBatch.Begin();
+            _spriteBatch.Begin();
+            //spriteBatch.Draw(card0tex, card0rect, Color.White);
+            //spriteBatch.Draw(card1tex, card1rect, Color.White);
+
+            foreach (Rectangle slot in cardSlot) {
+
+                spriteBatch.Draw(cardSlotTex, slot, Color.Black);
+
+            }
+
+            foreach (var item in _dragDropController.Items) { item.Draw(gameTime); }
+
+            /*spriteBatch.Begin(SpriteSortMode.BackToFront, null);
+
+            spriteBatch.Draw(card0tex, card0rect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1.0f);
+            spriteBatch.Draw(card1tex, card1rect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0.0f);
+            */
+
+            _spriteBatch.End();
+            spriteBatch.End();
+
 
             base.Draw(gameTime);
         }
