@@ -134,7 +134,7 @@ namespace OpenSolitaireMG {
             for (int i = 0; i < 7; i++) {
 
                 int x = (i * (cardWidth + spacer)) + (spacer / 2);
-                int y = 10;
+                int y = 220;
 
                 Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), cardWidth, cardHeight);
                 _dragDropController.Add(item);
