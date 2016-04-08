@@ -43,6 +43,13 @@ namespace OpenSolitaireMG {
         private SpriteBatch _spriteBatch;
         private DragAndDropController<Item> _dragDropController;
 
+        public float ScaledWidth(float width) {
+            return Window.ClientBounds.Width / WindowWidth;
+        }
+        public float ScaledHeight(float height) {
+            return Window.ClientBounds.Height / WindowHeight;
+        }
+
 
         public OpenSolitare() {
             graphics = new GraphicsDeviceManager(this);
@@ -70,7 +77,12 @@ namespace OpenSolitaireMG {
 
             float cardHeightF = (float)cardWidth * cardRatio;
             cardHeight = (int)cardHeightF;
-            
+
+            //need some way to call this on resize
+            if (_dragDropController != null) {
+
+            SetupDraggableItems();
+            }
        }
 
         /// <summary>
@@ -115,20 +127,18 @@ namespace OpenSolitaireMG {
             card0tex = Content.Load<Texture2D>(card0.asset);
             card1tex = Content.Load<Texture2D>(card1.asset);
 
-            
-            SetupDraggableItems();
-
 
             for (int i = 0; i < 7; i++) {
                 
                 cardSlot.Add(new Rectangle());
             }
 
-
+            SetupDraggableItems();
         }
 
         private void SetupDraggableItems() {
 
+           // _setSize();
             _dragDropController.Clear();
                         
             for (int i = 0; i < 7; i++) {
@@ -136,7 +146,7 @@ namespace OpenSolitaireMG {
                 int x = (i * (cardWidth + spacer)) + (spacer / 2);
                 int y = 220;
 
-                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), cardWidth, cardHeight);
+                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), .4f);
                 _dragDropController.Add(item);
             }
         }
@@ -160,8 +170,24 @@ namespace OpenSolitaireMG {
 
             // TODO: Add your update logic here
 
-            //card0rect = new Rectangle(150, 100, cardWidth, cardHeight);
-            //card1rect = new Rectangle(300, 100, cardWidth, cardHeight);
+
+
+            //SetupDraggableItems();
+
+            /*
+            _dragDropController.Clear();
+            for (int i = 0; i < 7; i++) {
+
+                int x = (i * (cardWidth + spacer)) + (spacer / 2);
+                int y = 220;
+
+                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), .4f);
+                _dragDropController.Add(item);
+            }
+            */
+
+            card0rect = new Rectangle(150, 220, cardWidth, cardHeight);
+            card1rect = new Rectangle(300, 220, cardWidth, cardHeight);
 
             for (int i = 0; i < 7; i++) {
 
@@ -171,8 +197,7 @@ namespace OpenSolitaireMG {
                 cardSlot[i] = new Rectangle(x, y, cardWidth, cardHeight);
             }
 
-
-            /*
+            
             MouseState mouse = Mouse.GetState();
             var mousePos = new Point(mouse.X, mouse.Y);
 
@@ -183,23 +208,21 @@ namespace OpenSolitaireMG {
 
                 Console.WriteLine(mouse.X + "," + mouse.Y);
 
-
-                /*
+            
                 if (card0rect.Contains(mousePos)) {
 
-                    card0rect.X = mouse.X - card0rect.Width/2;
-                    card0rect.Y = mouse.Y - card0rect.Height/2;
+                    card0rect.X = mouse.X - (card0rect.Width/2);
+                    card0rect.Y = mouse.Y - (card0rect.Height/2);
 
-                }*/
-                /*
+                }
                 //int deltaX = card0rect.X - mouse.X;
                 int deltaX = mouse.X - card1rect.X - (card1rect.Width / 2);
                 int deltaY = mouse.Y - card1rect.Y - (card1rect.Height / 2);
 
                 if (card1rect.Contains(mousePos)) {
 
-                    card1rect.X = mouse.X - (card1rect.Width / 2);
-                    card1rect.Y = mouse.Y - (card1rect.Height / 2);
+                    card1rect.X = deltaX;
+                    card1rect.Y = deltaY;
 
                     Console.WriteLine("mouse:" + mouse.X + "," + mouse.Y);
                     Console.WriteLine("card:" + card1rect.X + "," + card1rect.Y);
@@ -208,7 +231,7 @@ namespace OpenSolitaireMG {
                 }
                 
             }
-            */
+            
 
             base.Update(gameTime);
         }
@@ -230,8 +253,9 @@ namespace OpenSolitaireMG {
 
             spriteBatch.Begin();
             _spriteBatch.Begin();
-            //spriteBatch.Draw(card0tex, card0rect, Color.White);
-            //spriteBatch.Draw(card1tex, card1rect, Color.White);
+
+           // spriteBatch.Draw(card0tex, card0rect, Color.White);
+           // spriteBatch.Draw(card1tex, card1rect, Color.White);
 
             foreach (Rectangle slot in cardSlot) {
 
@@ -239,7 +263,9 @@ namespace OpenSolitaireMG {
 
             }
 
-            foreach (var item in _dragDropController.Items) { item.Draw(gameTime); }
+            float ratio = .002f * Window.ClientBounds.Width / 7;
+
+            foreach (var item in _dragDropController.Items) { item.Draw(gameTime,ratio); }
 
             /*spriteBatch.Begin(SpriteSortMode.BackToFront, null);
 

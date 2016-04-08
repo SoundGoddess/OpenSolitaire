@@ -20,8 +20,7 @@ namespace OpenSolitaireMG {
             return Border.Contains(mouse);
         }
 
-        private int cardWidth;
-        private int cardHeight;
+        private float resizeRatio;
 
         #endregion
 
@@ -38,15 +37,14 @@ namespace OpenSolitaireMG {
 
         #region Constructor and Draw
 
-        public Item(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, int width, int height) {
+        public Item(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, float ratio) {
             _spriteBatch = spriteBatch;
             Texture = texture;
             Position = position;
-            cardWidth = width;
-            cardHeight = height;
+            resizeRatio = ratio;
         }
 
-        public void Draw(GameTime gameTime) {
+        public void Draw(GameTime gameTime, float resizeMe) {
             Color colorToUse = Color.White;
             if (IsSelected) {
                 colorToUse = Color.Orange;
@@ -54,8 +52,9 @@ namespace OpenSolitaireMG {
             else {
                 if (IsMouseOver) { colorToUse = Color.Cyan; }
             }
-            //_spriteBatch.Draw(Texture, Position, new Rectangle((int)Position.X, (int)Position.Y,cardWidth,cardHeight), colorToUse);
-            _spriteBatch.Draw(Texture, Position, colorToUse);
+           //_spriteBatch.Draw(Texture, Position, new Rectangle((int)Position.X, (int)Position.Y,cardWidth,cardHeight), colorToUse);
+            _spriteBatch.Draw(Texture, Position, null, null, null, 0, new Vector2(resizeMe), colorToUse, SpriteEffects.None, 0);
+            //_spriteBatch.Draw(Texture, Position, colorToUse);
         }
 
         #endregion

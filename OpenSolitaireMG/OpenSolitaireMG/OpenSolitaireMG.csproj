@@ -15,6 +15,7 @@
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -30,7 +31,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -92,6 +92,64 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
+    <Content Include="Content\assets\10_of_clubs.png" />
+    <Content Include="Content\assets\10_of_diamonds.png" />
+    <Content Include="Content\assets\10_of_hearts.png" />
+    <Content Include="Content\assets\10_of_spades.png" />
+    <Content Include="Content\assets\2_of_clubs.png" />
+    <Content Include="Content\assets\2_of_diamonds.png" />
+    <Content Include="Content\assets\2_of_hearts.png" />
+    <Content Include="Content\assets\2_of_spades.png" />
+    <Content Include="Content\assets\3_of_clubs.png" />
+    <Content Include="Content\assets\3_of_diamonds.png" />
+    <Content Include="Content\assets\3_of_hearts.png" />
+    <Content Include="Content\assets\3_of_spades.png" />
+    <Content Include="Content\assets\4_of_clubs.png" />
+    <Content Include="Content\assets\4_of_diamonds.png" />
+    <Content Include="Content\assets\4_of_hearts.png" />
+    <Content Include="Content\assets\4_of_spades.png" />
+    <Content Include="Content\assets\5_of_clubs.png" />
+    <Content Include="Content\assets\5_of_diamonds.png" />
+    <Content Include="Content\assets\5_of_hearts.png" />
+    <Content Include="Content\assets\5_of_spades.png" />
+    <Content Include="Content\assets\6_of_clubs.png" />
+    <Content Include="Content\assets\6_of_diamonds.png" />
+    <Content Include="Content\assets\6_of_hearts.png" />
+    <Content Include="Content\assets\6_of_spades.png" />
+    <Content Include="Content\assets\7_of_clubs.png" />
+    <Content Include="Content\assets\7_of_diamonds.png" />
+    <Content Include="Content\assets\7_of_hearts.png" />
+    <Content Include="Content\assets\7_of_spades.png" />
+    <Content Include="Content\assets\8_of_clubs.png" />
+    <Content Include="Content\assets\8_of_diamonds.png" />
+    <Content Include="Content\assets\8_of_hearts.png" />
+    <Content Include="Content\assets\8_of_spades.png" />
+    <Content Include="Content\assets\9_of_clubs.png" />
+    <Content Include="Content\assets\9_of_diamonds.png" />
+    <Content Include="Content\assets\9_of_hearts.png" />
+    <Content Include="Content\assets\9_of_spades.png" />
+    <Content Include="Content\assets\ace_of_clubs.png" />
+    <Content Include="Content\assets\ace_of_diamonds.png" />
+    <Content Include="Content\assets\ace_of_hearts.png" />
+    <Content Include="Content\assets\ace_of_spades.png" />
+    <Content Include="Content\assets\back_purple.png" />
+    <Content Include="Content\assets\black_joker.png" />
+    <Content Include="Content\assets\cardslot.png" />
+    <Content Include="Content\assets\cardslot2.png" />
+    <Content Include="Content\assets\jack_of_clubs.png" />
+    <Content Include="Content\assets\jack_of_diamonds.png" />
+    <Content Include="Content\assets\jack_of_hearts.png" />
+    <Content Include="Content\assets\jack_of_spades.png" />
+    <Content Include="Content\assets\king_of_clubs.png" />
+    <Content Include="Content\assets\king_of_diamonds.png" />
+    <Content Include="Content\assets\king_of_hearts.png" />
+    <Content Include="Content\assets\king_of_spades.png" />
+    <Content Include="Content\assets\queen_of_clubs.png" />
+    <Content Include="Content\assets\queen_of_diamonds.png" />
+    <Content Include="Content\assets\queen_of_hearts.png" />
+    <Content Include="Content\assets\queen_of_spades.png" />
+    <Content Include="Content\assets\red_joker.png" />
+    <Content Include="Content\assets\white.png" />
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
