@@ -115,14 +115,15 @@ namespace OpenSolitaireMG {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            //_spriteBatch = new SpriteBatch(GraphicsDevice);
 
 
-            _dragDropController = new DragAndDropController<Item>(this, _spriteBatch);
+            _dragDropController = new DragAndDropController<Item>(this, spriteBatch);
             Components.Add(_dragDropController);
 
 
-            cardSlotTex = Content.Load<Texture2D>("assets/cardslot2");
+            cardSlotTex = Content.Load<Texture2D>("assets/cardslot");
             cardBackTex = Content.Load<Texture2D>("assets/back_purple");
             card0tex = Content.Load<Texture2D>(card0.asset);
             card1tex = Content.Load<Texture2D>(card1.asset);
@@ -146,7 +147,7 @@ namespace OpenSolitaireMG {
                 int x = (i * (cardWidth + spacer)) + (spacer / 2);
                 int y = 220;
 
-                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), .4f);
+                Item item = new Item(spriteBatch, cardBackTex, new Vector2(x, y), .4f);
                 _dragDropController.Add(item);
             }
         }
@@ -169,22 +170,7 @@ namespace OpenSolitaireMG {
                 Exit();
 
             // TODO: Add your update logic here
-
-
-
-            //SetupDraggableItems();
-
-            /*
-            _dragDropController.Clear();
-            for (int i = 0; i < 7; i++) {
-
-                int x = (i * (cardWidth + spacer)) + (spacer / 2);
-                int y = 220;
-
-                Item item = new Item(_spriteBatch, cardBackTex, new Vector2(x, y), .4f);
-                _dragDropController.Add(item);
-            }
-            */
+            
 
             card0rect = new Rectangle(150, 220, cardWidth, cardHeight);
             card1rect = new Rectangle(300, 220, cardWidth, cardHeight);
@@ -197,41 +183,7 @@ namespace OpenSolitaireMG {
                 cardSlot[i] = new Rectangle(x, y, cardWidth, cardHeight);
             }
 
-            
-            MouseState mouse = Mouse.GetState();
-            var mousePos = new Point(mouse.X, mouse.Y);
-
-            //drawRectangle.X = mouse.X - currentCharacter.Width / 2;
-            //drawRectangle.Y = mouse.Y - currentCharacter.Height / 2;
-
-            if (mouse.LeftButton == ButtonState.Pressed) {
-
-                Console.WriteLine(mouse.X + "," + mouse.Y);
-
-            
-                if (card0rect.Contains(mousePos)) {
-
-                    card0rect.X = mouse.X - (card0rect.Width/2);
-                    card0rect.Y = mouse.Y - (card0rect.Height/2);
-
-                }
-                //int deltaX = card0rect.X - mouse.X;
-                int deltaX = mouse.X - card1rect.X - (card1rect.Width / 2);
-                int deltaY = mouse.Y - card1rect.Y - (card1rect.Height / 2);
-
-                if (card1rect.Contains(mousePos)) {
-
-                    card1rect.X = deltaX;
-                    card1rect.Y = deltaY;
-
-                    Console.WriteLine("mouse:" + mouse.X + "," + mouse.Y);
-                    Console.WriteLine("card:" + card1rect.X + "," + card1rect.Y);
-                    Console.WriteLine("delta:" + deltaX + "," + deltaY);
-
-                }
-                
-            }
-            
+                       
 
             base.Update(gameTime);
         }
@@ -244,15 +196,11 @@ namespace OpenSolitaireMG {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-
-            Console.WriteLine(Window.ClientBounds.Width + "," + Window.ClientBounds.Height);
-
-
+            
 
             // z-index is determined by the order which the spriteBatch.Draw methods are called
 
             spriteBatch.Begin();
-            _spriteBatch.Begin();
 
            // spriteBatch.Draw(card0tex, card0rect, Color.White);
            // spriteBatch.Draw(card1tex, card1rect, Color.White);
@@ -272,8 +220,7 @@ namespace OpenSolitaireMG {
             spriteBatch.Draw(card0tex, card0rect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1.0f);
             spriteBatch.Draw(card1tex, card1rect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0.0f);
             */
-
-            _spriteBatch.End();
+            
             spriteBatch.End();
 
 
