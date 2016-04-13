@@ -158,7 +158,7 @@ namespace OpenSolitaireMG {
                 if (MouseWasJustPressed) {
                     DeselectAll();
                     _mouseDown = CurrentMousePosition;
-                    _isDraggingRectangle = true;
+                  //  _isDraggingRectangle = true;
                 }
             }
 
@@ -208,7 +208,12 @@ namespace OpenSolitaireMG {
             itemToSelect.IsSelected = true;
             if (!_selectedItems.Contains(itemToSelect)) {
                 _selectedItems.Add(itemToSelect);
+
+                //in theory this should bring the item to the top
+                _items.Remove(itemToSelect);
+                _items.Add(itemToSelect);
             }
+
         }
 
         private void DeselectItem(T itemToDeselect) {

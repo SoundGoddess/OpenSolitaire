@@ -1,6 +1,10 @@
 ###Source Code: 
 [GPL 3](http://www.gnu.org/licenses/gpl-3.0.html)
 
+###Empty Keys:
+[Copyright (c) 2014 Empty Keys, Filip Dušek](http://www.emptykeys.com)
+
+[Copyright (c) 2015 Microsoft](https://github.com/Microsoft/XamlBehaviors)
 
 ###Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))

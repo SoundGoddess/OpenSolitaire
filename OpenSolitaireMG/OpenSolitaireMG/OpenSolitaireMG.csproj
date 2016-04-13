@@ -54,7 +54,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Spade.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>01F875624529E4F7B97389B6A6FF2B38DD586B3F</ManifestCertificateThumbprint>
@@ -67,6 +67,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>OpenSolitaireMG.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Deck.cs" />
@@ -91,7 +94,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Spade.ico" />
     <EmbeddedResource Include="Icon.ico" />
+    <Content Include="Club.ico" />
     <Content Include="Content\assets\10_of_clubs.png" />
     <Content Include="Content\assets\10_of_diamonds.png" />
     <Content Include="Content\assets\10_of_hearts.png" />
