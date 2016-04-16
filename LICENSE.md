@@ -1,7 +1,10 @@
 ###Source Code: 
-[GPL 3](http://www.gnu.org/licenses/gpl-3.0.html)
+[Copyright (c) 2016 HathorsLove.com](http://www.gnu.org/licenses/gpl-3.0.html)
 
-###Empty Keys:
+####MonoGame:
+[Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt)
+
+####Empty Keys:
 [Copyright (c) 2014 Empty Keys, Filip Dušek](http://www.emptykeys.com)
 
 [Copyright (c) 2015 Microsoft](https://github.com/Microsoft/XamlBehaviors)

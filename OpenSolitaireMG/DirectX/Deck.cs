@@ -60,13 +60,11 @@ namespace OpenSolitaireMG {
         public char rank;
         public Suit suit;
         bool isFaceUp = false;
-        string cardback;
 
-        public Card (char rank, Suit suit, string cardback) {
+        public Card (char rank, Suit suit) {
 
             this.rank = rank;
             this.suit = suit;
-            this.cardback = cardback;
 
         }
 
@@ -107,40 +105,31 @@ namespace OpenSolitaireMG {
 
             get {
 
-                if (isFaceUp) {
-                    string location;
+                string location;
 
-                    switch (rank) {
+                switch (rank) {
 
-                        case 'A':
-                            location = "ace";
-                            break;
-                        case 'K':
-                            location = "king";
-                            break;
-                        case 'Q':
-                            location = "queen";
-                            break;
-                        case 'J':
-                            location = "jack";
-                            break;
-                        default:
-                            location = rank.ToString();
-                            break;
-
-                    }
-
-                    location = "assets/" + location + "_of_" + suit;
-
-                    return location;
-                }
-
-                else {
-
-                    return cardback;
+                    case 'A':
+                        location = "ace";
+                        break;
+                    case 'K':
+                        location = "king";
+                        break;
+                    case 'Q':
+                        location = "queen";
+                        break;
+                    case 'J':
+                        location = "jack";
+                        break;
+                    default:
+                        location = rank.ToString();
+                        break;
 
                 }
-               
+
+                location = "assets/" + location + "_of_" + suit;
+
+                return location;
 
             }
 
@@ -170,7 +159,7 @@ namespace OpenSolitaireMG {
 
                 foreach (char myRank in ranks.ranks) {
 
-                    cards.Add(new Card(myRank, mySuit, "assets/back_purple"));
+                    cards.Add(new Card(myRank, mySuit));
 
                 }
 
