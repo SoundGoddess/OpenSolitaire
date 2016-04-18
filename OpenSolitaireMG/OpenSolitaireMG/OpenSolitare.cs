@@ -36,8 +36,8 @@ namespace OpenSolitaireMG {
 
         int spacer, cardWidth, cardHeight;
 
-     
-        Deck drawPile, discardPile;
+        bool initialSetup = false;
+
         
         Texture2D cardSlotTex, cardSlotTex2;
         Texture2D cardBackTex;
@@ -49,10 +49,12 @@ namespace OpenSolitaireMG {
         List<Texture2D> cardTex = new List<Texture2D>();
         List<Deck> tablePile = new List<Deck>();
         List<Deck> scorePile = new List<Deck>();
-
+        List<Vector2> animationQueue = new List<Vector2>();
+     
+        Deck drawPile, discardPile;
         Rectangle drawPileRect, discardPileRect;
 
-
+        
         List<Rectangle> cardSlot = new List<Rectangle>();
         List<Rectangle> scoreSlot = new List<Rectangle>();
 
@@ -149,11 +151,6 @@ namespace OpenSolitaireMG {
         /// </summary>
         protected override void Initialize() {
             
-            drawPile = new Deck();
-            drawPile.freshDeck();
-            drawPile.shuffle();
-
-            discardPile = new Deck();
             
 
             for (int i = 0; i < 7; i++) {
@@ -192,6 +189,24 @@ namespace OpenSolitaireMG {
             cardBackTex = Content.Load<Texture2D>("assets/back_purple");
             refreshMe = Content.Load<Texture2D>("assets/refresh");
 
+
+            drawPile = new Deck(cardBackTex);
+            drawPile.freshDeck();
+            drawPile.shuffle();
+
+            discardPile = new Deck(cardBackTex);
+
+            for (int i = 0; i < 7; i++) {
+                tablePile.Add(new Deck(cardBackTex));
+            }
+
+            foreach (Card loadTexture in drawPile.cards) {
+
+                loadTexture.SetTexture(Content.Load<Texture2D>(loadTexture.asset));
+
+            }
+
+
             SetupDraggableItems();
             SetupTable();
 
@@ -199,24 +214,18 @@ namespace OpenSolitaireMG {
 
         private void SetupTable() {
 
-            for (int i = 0; i < 4; i++) {
-
-                scoreSlot.Add(new Rectangle());
-            }
-
-            for (int i = 0; i < 7; i++) {
-                //cardTex.Add(Content.Load<Texture2D>(cards[i].asset));
-                cardSlot.Add(new Rectangle());
-            }
-
-
+            for (int i = 0; i < 4; i++) scoreSlot.Add(new Rectangle());
+            for (int i = 0; i < 7; i++) cardSlot.Add(new Rectangle());
+            
             int x, y;
 
             x = spacer * 3;
             y = spacer * 3;
 
             drawPileRect = new Rectangle(x, y, cardWidth, cardHeight);
-
+            
+            foreach (Card card in drawPile.cards) card.SetRectangle(new Rectangle(x, y, cardWidth, cardHeight));
+            
             x += cardWidth + spacer;
 
             discardPileRect = new Rectangle(x, y, cardWidth, cardHeight);
@@ -233,6 +242,11 @@ namespace OpenSolitaireMG {
                 scoreSlot[i] = new Rectangle(x + newspacer, y, cardWidth, cardHeight);
             }
 
+            refreshRect = new Rectangle(drawPileRect.X + cardWidth / 2 - refreshMe.Width, 
+                drawPileRect.Y + cardHeight / 2 - refreshMe.Height, refreshMe.Width * 2, refreshMe.Height * 2);
+
+
+            animationQueue.Clear();
 
             for (int i = 0; i < 7; i++) {
 
@@ -240,10 +254,13 @@ namespace OpenSolitaireMG {
                 y = cardHeight + spacer * 7;
 
                 cardSlot[i] = new Rectangle(x, y, cardWidth, cardHeight);
+                                
+                animationQueue.Add(new Vector2(cardSlot[i].X, cardSlot[i].Y));
+
+                //for (int j = 0; j < i+1; j++) { }
+                
             }
-
-            refreshRect = new Rectangle(drawPileRect.X + cardWidth / 2 - refreshMe.Width, drawPileRect.Y + cardHeight / 2 - refreshMe.Height, refreshMe.Width * 2, refreshMe.Height * 2);
-
+            
 
         }
 
@@ -292,14 +309,77 @@ namespace OpenSolitaireMG {
 
             // TODO: Add your update logic here
 
-            drawPileRect.X += 1;
-            drawPileRect.Y += 2;
 
-            
 
+
+            // int x = 1;
+
+            for (int i = 1; i < animationQueue.Count+1; i++) {
+                
+                Rectangle sprite = drawPile.cards[i-1].rect;
+                bool hasArrived = AnimateSprite(ref sprite, animationQueue[i - 1]);
+
+                if (hasArrived) {
+                    if (!drawPile.cards[i-1].faceUp) {
+                        drawPile.cards[i-1].flipCard();
+                    }
+                }
+                    
+                drawPile.cards[i-1].SetRectangle(sprite);
+
+                /*
+                if (hasArrived) {
+
+                    Card card = drawPile.cards[i-1];
+                    drawPile.cards[i] = card;
+
+                }
+
+                if (hasArrived) {
+
+                    //playCard pops a card object off the deck at the specified index
+                    Card card = drawPile.playCard(i-1);
+                    if (!card.faceUp) {
+                        card.flipCard();
+                    }
+
+                    tablePile[i-1].addCard(card);
+  //                  animationQueue.Remove(v);
+                }
+                else {
+                    drawPile.cards[drawPile.cards.Count - i].SetRectangle(sprite);     
+                }
+                */
+                
+            }
+
+
+
+
+            // Console.WriteLine(sprite.X + "," + sprite.Y);
 
             base.Update(gameTime);
         }
+
+
+        bool AnimateSprite(ref Rectangle sprite, Vector2 destination) {
+
+            bool hasArrived = false;
+
+            if (sprite.X < destination.X) sprite.X++; 
+            else if (sprite.X > destination.X) sprite.X--;
+
+            if (sprite.Y < destination.Y) sprite.Y++;
+            else if (sprite.Y > destination.Y) sprite.Y--;
+
+            if ((sprite.X == destination.X) && (sprite.Y == destination.Y)) hasArrived = true;
+
+            return hasArrived;
+            
+        }
+
+
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -340,10 +420,15 @@ namespace OpenSolitaireMG {
 
             foreach (var item in _dragDropController.Items) { item.Draw(gameTime,ratio); }
 
+            foreach (Deck deck in tablePile) {
 
-            if (drawPile.Count > 0) {
+                foreach (Card card in deck.cards) { spriteBatch.Draw(card.texture, card.rect, Color.White); }
+                
+            }
 
-                spriteBatch.Draw(cardBackTex, drawPileRect, Color.White);
+            for (int i = 0; i < drawPile.cards.Count; i++) { 
+                
+               spriteBatch.Draw(drawPile.cards[i].texture, drawPile.cards[i].rect, Color.White);
 
             }
 

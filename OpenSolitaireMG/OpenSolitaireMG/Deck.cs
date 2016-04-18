@@ -12,6 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace OpenSolitaireMG {
 
@@ -60,9 +63,10 @@ namespace OpenSolitaireMG {
         public char rank;
         public Suit suit;
         bool isFaceUp = false;
-        string cardback;
+        Texture2D cardback, _texture;
+        Rectangle _rect;
 
-        public Card (char rank, Suit suit, string cardback) {
+        public Card (char rank, Suit suit, Texture2D cardback) {
 
             this.rank = rank;
             this.suit = suit;
@@ -91,60 +95,67 @@ namespace OpenSolitaireMG {
 
         }
 
+        public void SetTexture(Texture2D texture) { _texture = texture; }
+        public void SetRectangle(Rectangle rect) { _rect = rect; }
+
         #endregion
 
         #region properties
 
-        public int index {
-
-            get { return Array.IndexOf(ranks.ranks, rank); }
-
-        }
+        public int index { get { return Array.IndexOf(ranks.ranks, rank); } }
 
         // hard coded to the particular deck I'm using atm.  can update later
+
+        public Rectangle rect { get { return _rect; } }
 
         public string asset {
 
             get {
 
-                if (isFaceUp) {
-                    string location;
+                string location;
 
-                    switch (rank) {
+                switch (rank) {
 
-                        case 'A':
-                            location = "ace";
-                            break;
-                        case 'K':
-                            location = "king";
-                            break;
-                        case 'Q':
-                            location = "queen";
-                            break;
-                        case 'J':
-                            location = "jack";
-                            break;
-                        default:
-                            location = rank.ToString();
-                            break;
-
-                    }
-
-                    location = "assets/" + location + "_of_" + suit;
-
-                    return location;
-                }
-
-                else {
-
-                    return cardback;
+                    case 'A':
+                        location = "ace";
+                        break;
+                    case 'K':
+                        location = "king";
+                        break;
+                    case 'Q':
+                        location = "queen";
+                        break;
+                    case 'J':
+                        location = "jack";
+                        break;
+                    default:
+                        location = rank.ToString();
+                        break;
 
                 }
-               
+
+                location = "assets/" + location + "_of_" + suit;
+
+                return location;
 
             }
 
         }
+
+
+        public Texture2D texture {
+
+            get {
+
+                if (isFaceUp) return _texture;
+                else return cardback;
+                
+            }
+
+        }
+
+
+
 
         public bool faceUp { get { return isFaceUp; } }
 
@@ -157,10 +168,15 @@ namespace OpenSolitaireMG {
     class Deck {
 
         Rank ranks = new Rank();
-        List<Card> cards = new List<Card>();
+        public List<Card> cards = new List<Card>();
+        private Texture2D _cardBack;
+
+        
 
         #region methods
-        
+        public Deck(Texture2D cardBack) { _cardBack = cardBack; }
+
+
         //populate your deck with a typical set of cards
         public void freshDeck() {
 
@@ -170,7 +186,7 @@ namespace OpenSolitaireMG {
 
                 foreach (char myRank in ranks.ranks) {
 
-                    cards.Add(new Card(myRank, mySuit, "assets/back_purple"));
+                    cards.Add(new Card(myRank, mySuit, _cardBack));
 
                 }
 
@@ -199,7 +215,7 @@ namespace OpenSolitaireMG {
 
             cards.Clear();
 
-            Deck subDeck = new Deck();
+            Deck subDeck = new Deck(_cardBack);
             subDeck.freshDeck();
             subDeck.shuffle();
 
@@ -297,7 +313,11 @@ namespace OpenSolitaireMG {
         #region properties
 
         public int Count { get { return cards.Count; } }
+        public Texture2D cardBack {
 
+            get { return _cardBack; }
+
+        }
 
         #endregion
 
