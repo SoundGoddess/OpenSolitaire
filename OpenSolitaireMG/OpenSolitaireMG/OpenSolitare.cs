@@ -5,9 +5,9 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-using EmptyKeys.UserInterface;
-using EmptyKeys.UserInterface.Controls;
-using EmptyKeys.UserInterface.Generated;
+//using EmptyKeys.UserInterface;
+//using EmptyKeys.UserInterface.Controls;
+//using EmptyKeys.UserInterface.Generated;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,19 +26,20 @@ namespace OpenSolitaireMG {
         const int WindowHeight = 768;
 
 
-        private Root root;
+      //  private Root root;
 
         private int nativeScreenWidth;
         private int nativeScreenHeight;
 
+        private MouseState prevMouseState;
 
         const float cardRatio = 1.452f;
 
         int spacer, cardWidth, cardHeight;
 
         bool initialSetup = false;
+        bool doOnce = true;
 
-        
         Texture2D cardSlotTex, cardSlotTex2;
         Texture2D cardBackTex;
 
@@ -50,6 +51,7 @@ namespace OpenSolitaireMG {
         List<Deck> tablePile = new List<Deck>();
         List<Deck> scorePile = new List<Deck>();
         List<Vector2> animationQueue = new List<Vector2>();
+
      
         Deck drawPile, discardPile;
         Rectangle drawPileRect, discardPileRect;
@@ -77,8 +79,8 @@ namespace OpenSolitaireMG {
 
             this.Window.Title = "Open Solitaire";
 
-
-            this.Window.AllowUserResizing = true;
+            //disable for now
+            //this.Window.AllowUserResizing = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -126,7 +128,7 @@ namespace OpenSolitaireMG {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void graphics_DeviceCreated(object sender, EventArgs e) {
-            Engine engine = new MonoGameEngine(GraphicsDevice, nativeScreenWidth, nativeScreenHeight);
+            //Engine engine = new MonoGameEngine(GraphicsDevice, nativeScreenWidth, nativeScreenHeight);
         }
 
         private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e) {
@@ -169,11 +171,11 @@ namespace OpenSolitaireMG {
 
             //empty keys stuff
 
-            SpriteFont font = Content.Load<SpriteFont>("Segoe_UI_15_Bold");
+            //SpriteFont font = Content.Load<SpriteFont>("Segoe_UI_15_Bold");
             //FontManager.DefaultFont = Engine.Instance.Renderer.CreateFont(font);
-            root = new Root();
+            //root = new Root();
 
-            FontManager.Instance.LoadFonts(Content);
+            //FontManager.Instance.LoadFonts(Content);
             
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -186,7 +188,7 @@ namespace OpenSolitaireMG {
 
             cardSlotTex = Content.Load<Texture2D>("assets/cardslot");
             cardSlotTex2 = Content.Load<Texture2D>("assets/cardslot2");
-            cardBackTex = Content.Load<Texture2D>("assets/back_purple");
+            cardBackTex = Content.Load<Texture2D>("assets/green_back");
             refreshMe = Content.Load<Texture2D>("assets/refresh");
 
 
@@ -254,10 +256,16 @@ namespace OpenSolitaireMG {
                 y = cardHeight + spacer * 7;
 
                 cardSlot[i] = new Rectangle(x, y, cardWidth, cardHeight);
-                                
-                animationQueue.Add(new Vector2(cardSlot[i].X, cardSlot[i].Y));
+                
+                animationQueue.Add(new Vector2(x, y));
 
-                //for (int j = 0; j < i+1; j++) { }
+                int z = 25;
+
+                for (int j = 1; j < i+1; j++) {
+                    
+                    animationQueue.Add(new Vector2(x, y + (z*j)));
+
+                }
                 
             }
             
@@ -303,61 +311,98 @@ namespace OpenSolitaireMG {
 
 
             // empty keys update
-            root.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
-            root.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
+        //    root.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
+        //    root.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
 
-
+            
             // TODO: Add your update logic here
 
+            if (initialSetup) {
 
+                MouseState mouseState = Mouse.GetState();
 
-
-            // int x = 1;
-
-            for (int i = 1; i < animationQueue.Count+1; i++) {
-                
-                Rectangle sprite = drawPile.cards[i-1].rect;
-                bool hasArrived = AnimateSprite(ref sprite, animationQueue[i - 1]);
-
-                if (hasArrived) {
-                    if (!drawPile.cards[i-1].faceUp) {
-                        drawPile.cards[i-1].flipCard();
-                    }
-                }
+                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
                     
-                drawPile.cards[i-1].SetRectangle(sprite);
+                    if (drawPileRect.Contains(mouseState.X, mouseState.Y)) {
 
-                /*
-                if (hasArrived) {
+                        if (drawPile.Count > 0) {
+                            Card card = drawPile.drawCard();
+                            card.SetRectangle(discardPileRect);
+                            card.flipCard();
+                            discardPile.addCard(card);
+                        }
+                        else {
+                            
+                            // drew all the cards from the deck; time to move the cards back to the draw pile
+                            for (int i = discardPile.Count-1; i >= 0; i--) {
+                                
+                                Card card = discardPile.drawCard();
+                                card.SetRectangle(drawPileRect);
+                                card.flipCard();
+                                drawPile.addCard(card);
 
-                    Card card = drawPile.cards[i-1];
-                    drawPile.cards[i] = card;
+                            }
+                            
+                        }
 
-                }
-
-                if (hasArrived) {
-
-                    //playCard pops a card object off the deck at the specified index
-                    Card card = drawPile.playCard(i-1);
-                    if (!card.faceUp) {
-                        card.flipCard();
                     }
 
-                    tablePile[i-1].addCard(card);
-  //                  animationQueue.Remove(v);
                 }
-                else {
-                    drawPile.cards[drawPile.cards.Count - i].SetRectangle(sprite);     
+                  
+                prevMouseState = mouseState;
+
+                // once the deck has finished dealing into the piles, flip the top card
+                if (doOnce) {
+
+                    for (int i = 0; i < 7; i++) {
+
+                        Card card = drawPile.drawCard();
+
+                        tablePile[i].addCard(card);
+
+                        if (i == 0) card.flipCard();
+
+                        for (int j = 1; j < i + 1; j++) {
+
+                            card = drawPile.drawCard();
+
+                            if (j == i) card.flipCard();
+
+                            tablePile[i].addCard(card);
+
+                        }
+
+                    }
+
+                    doOnce = false;
+
                 }
-                */
-                
+
             }
 
+            int animationCount = 0;
+            
+            // animates dealing from the draw pile to set up the board
+            if (animationQueue.Count > 0) { 
+                for (int i = 1; i < animationQueue.Count + 1; i++) {
 
+                    Rectangle sprite = drawPile.cards[drawPile.cards.Count - i].rect;
+                    bool hasArrived = AnimateSprite(ref sprite, animationQueue[i - 1]);
 
+                    if (hasArrived) animationCount++;
 
-            // Console.WriteLine(sprite.X + "," + sprite.Y);
+                    drawPile.cards[drawPile.cards.Count - i].SetRectangle(sprite);
 
+                }
+            }
+            
+            if (animationCount == animationQueue.Count) {
+
+                initialSetup = true;
+                animationQueue.Clear();
+
+            }
+            
             base.Update(gameTime);
         }
 
@@ -366,7 +411,14 @@ namespace OpenSolitaireMG {
 
             bool hasArrived = false;
 
+            //yes I called this 3x; animation looks a lot better this way.
+            //can't do X+=3 because then the card may get stuck
+
             if (sprite.X < destination.X) sprite.X++; 
+            else if (sprite.X > destination.X) sprite.X--;
+            if (sprite.X < destination.X) sprite.X++;
+            else if (sprite.X > destination.X) sprite.X--;
+            if (sprite.X < destination.X) sprite.X++;
             else if (sprite.X > destination.X) sprite.X--;
 
             if (sprite.Y < destination.Y) sprite.Y++;
@@ -386,7 +438,7 @@ namespace OpenSolitaireMG {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.SandyBrown);
 
             // TODO: Add your drawing code here
             
@@ -422,15 +474,23 @@ namespace OpenSolitaireMG {
 
             foreach (Deck deck in tablePile) {
 
-                foreach (Card card in deck.cards) { spriteBatch.Draw(card.texture, card.rect, Color.White); }
+                foreach (Card card in deck.cards) {
+
+                    spriteBatch.Draw(card.texture, card.rect, Color.White);
+
+                    Console.WriteLine(card.ToString());
+
+                }
                 
             }
 
-            for (int i = 0; i < drawPile.cards.Count; i++) { 
+            for (int i = drawPile.cards.Count - 1; i >= 0; i--) { 
                 
                spriteBatch.Draw(drawPile.cards[i].texture, drawPile.cards[i].rect, Color.White);
 
             }
+
+            foreach (Card card in discardPile.cards) spriteBatch.Draw(card.texture, card.rect, Color.White);
 
             
             spriteBatch.End();
