@@ -330,6 +330,11 @@ namespace OpenSolitaireMG {
                             card.SetRectangle(discardPileRect);
                             card.flipCard();
                             discardPile.addCard(card);
+
+
+                            Item item = new Item(spriteBatch, card.texture, new Vector2(card.rect.X, card.rect.Y));
+                            _dragDropController.Add(item);
+
                         }
                         else {
                             
@@ -340,6 +345,8 @@ namespace OpenSolitaireMG {
                                 card.SetRectangle(drawPileRect);
                                 card.flipCard();
                                 drawPile.addCard(card);
+
+
 
                             }
                             
@@ -360,13 +367,24 @@ namespace OpenSolitaireMG {
 
                         tablePile[i].addCard(card);
 
-                        if (i == 0) card.flipCard();
+                        if (i == 0) {
+                            card.flipCard();
+
+                            Item item = new Item(spriteBatch, card.texture, new Vector2(card.rect.X, card.rect.Y));
+                            _dragDropController.Add(item);
+                        }
 
                         for (int j = 1; j < i + 1; j++) {
 
                             card = drawPile.drawCard();
 
-                            if (j == i) card.flipCard();
+                            if (j == i) {
+                                card.flipCard();
+
+                                Item item = new Item(spriteBatch, card.texture, new Vector2(card.rect.X, card.rect.Y));
+                                _dragDropController.Add(item);
+
+                            }
 
                             tablePile[i].addCard(card);
 
@@ -389,7 +407,9 @@ namespace OpenSolitaireMG {
                     Rectangle sprite = drawPile.cards[drawPile.cards.Count - i].rect;
                     bool hasArrived = AnimateSprite(ref sprite, animationQueue[i - 1]);
 
-                    if (hasArrived) animationCount++;
+                    if (hasArrived) {
+                        animationCount++;
+                    }
 
                     drawPile.cards[drawPile.cards.Count - i].SetRectangle(sprite);
 
@@ -470,15 +490,13 @@ namespace OpenSolitaireMG {
             float ratio = .0019f * Window.ClientBounds.Width / 7;
             
 
-            foreach (var item in _dragDropController.Items) { item.Draw(gameTime,ratio); }
 
             foreach (Deck deck in tablePile) {
 
                 foreach (Card card in deck.cards) {
 
                     spriteBatch.Draw(card.texture, card.rect, Color.White);
-
-                    Console.WriteLine(card.ToString());
+                    
 
                 }
                 
@@ -493,6 +511,9 @@ namespace OpenSolitaireMG {
             foreach (Card card in discardPile.cards) spriteBatch.Draw(card.texture, card.rect, Color.White);
 
             
+            foreach (var item in _dragDropController.Items) { item.Draw(gameTime,ratio); }
+
+
             spriteBatch.End();
 
 
