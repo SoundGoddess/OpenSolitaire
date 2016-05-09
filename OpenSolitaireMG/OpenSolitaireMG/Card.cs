@@ -128,7 +128,6 @@ namespace OpenSolitaireMG {
         
         public Rectangle rect { get { return _rect; } }
 
-        // hard coded to the current deck asset set can be improved later
         public string asset {
 
             get {
@@ -155,6 +154,7 @@ namespace OpenSolitaireMG {
 
                 }
 
+                // hard coded to the current deck asset set can be improved later
                 location = "assets/" + location + "_of_" + suit;
 
                 return location;

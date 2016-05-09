@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
+# Visual Studio 2012
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSolitaireMG", "OpenSolitaireMG\OpenSolitaireMG.csproj", "{43E2658B-B7E6-4888-8046-1C499DADA3EE}"
@@ -52,6 +52,8 @@ Global
 		{FC00DFB6-78B8-409A-B2D9-A1F3E8BE73D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FC00DFB6-78B8-409A-B2D9-A1F3E8BE73D7}.Release|x86.ActiveCfg = Release|Any CPU
 		{FC00DFB6-78B8-409A-B2D9-A1F3E8BE73D7}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
