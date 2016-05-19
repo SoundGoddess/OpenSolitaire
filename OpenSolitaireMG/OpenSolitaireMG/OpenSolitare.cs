@@ -277,7 +277,7 @@ namespace OpenSolitaireMG {
            // _setSize();
             _dragDropController.Clear();
 
-            int x, y;
+            //int x, y;
                     
             //todo: add better logic
             /*
