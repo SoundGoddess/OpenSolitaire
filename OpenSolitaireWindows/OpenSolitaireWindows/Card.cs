@@ -46,6 +46,7 @@ namespace OpenSolitaireMG {
         
         public Rank rank;
         public Suit suit;
+
         bool isFaceUp = false;
         Texture2D cardback, _texture;
 

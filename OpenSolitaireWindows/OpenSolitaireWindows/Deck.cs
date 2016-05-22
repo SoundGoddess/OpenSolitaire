@@ -62,7 +62,7 @@ namespace OpenSolitaireMG {
                 foreach (Card card in cards) {
 
                     String strFaceUp = (card.faceUp ? "face up" : "face down");
-                    //Console.WriteLine(card.index.ToString("00") + ": " + card.rank + " of " + card.suit + " (" + strFaceUp + ")");
+                    Console.WriteLine(card.ZIndex.ToString("00") + ": " + card.rank + " of " + card.suit + " (" + strFaceUp + ")");
 
                 }
             }

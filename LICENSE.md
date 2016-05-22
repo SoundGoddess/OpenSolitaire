@@ -1,5 +1,5 @@
 ###Source Code: 
-[Copyright (c) 2016 HathorsLove.com](http://www.gnu.org/licenses/gpl-3.0.html)
+[Copyright (c) 2016 HathorsLove.com (GPL-3)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 ####MonoGame:
 [Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt)
@@ -11,6 +11,7 @@
 
 ###Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
+CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))
 
 ###Audio Assets:
 Public Domain (mostly from [sonniss.com](sonniss.com))
