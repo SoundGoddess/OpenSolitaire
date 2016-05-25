@@ -1,18 +1,55 @@
-﻿using Microsoft.Xna.Framework;
+﻿/* ©2016 Hathor Gaia 
+ * http://HathorsLove.com
+ * 
+ * Licensed Under GNU GPL 3:
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
+ 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Ruge.ViewportAdapters;
+using MonoGame.Ruge.CardEngine;
+using MonoGame.Ruge.DragonDrop;
 
 namespace OpenSolitaire {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class OpenSolitaireGame : Game {
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        BoxingViewportAdapter viewport;
+
+        const int WindowWidth = 1035;
+        const int WindowHeight = 750;
+
+        const int spacer = 10;
+        const int cardWidth = 125;
+        const int cardHeight = 156;
+
+        Texture2D cardSlot, cardBack, refreshMe;
+        
+        CardTable table;
+
+        DragonDrop<IDragonDropItem> dragonDrop;
+
         public OpenSolitaireGame() {
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            // set the screen resolution
+            graphics.PreferredBackBufferWidth = WindowWidth;
+            graphics.PreferredBackBufferHeight = WindowHeight;
+
+            this.Window.Title = "Open Solitaire";
+            this.Window.AllowUserResizing = true;
+
+            IsMouseVisible = true;
+
         }
 
         /// <summary>
@@ -22,7 +59,8 @@ namespace OpenSolitaire {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            // TODO: Add your initialization logic here
+
+            viewport = new BoxingViewportAdapter(Window, GraphicsDevice, WindowWidth, WindowHeight);
 
             base.Initialize();
         }
@@ -34,8 +72,29 @@ namespace OpenSolitaire {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            cardSlot = Content.Load<Texture2D>("card_slot");
+            cardBack = Content.Load<Texture2D>("card_back_green");
+            refreshMe = Content.Load<Texture2D>("refresh");
 
-            // TODO: use this.Content to load your game content here
+            dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
+
+            // table creates a fresh table.deck
+            table = new CardTable(dragonDrop, cardBack, cardSlot, 10, 10);
+
+            // load up the card assets for the new deck
+            foreach (Card card in table.deck.cards) {
+
+                string location = card.suit.ToString() + card.rank.ToString();
+                card.SetTexture(Content.Load<Texture2D>(location));
+
+            }
+
+            table.SetTable();
+
+            
+            Components.Add(dragonDrop);
+
         }
 
         /// <summary>
@@ -55,7 +114,13 @@ namespace OpenSolitaire {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            foreach (Slot slot in table.slots) slot.Update(gameTime);
+
+            foreach (Stack stack in table.stacks) {
+
+                foreach (Card card in stack.cards) card.Update(gameTime);
+
+            }
 
             base.Update(gameTime);
         }
@@ -65,9 +130,27 @@ namespace OpenSolitaire {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            GraphicsDevice.Clear(Color.SandyBrown);
+
+            spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
+            
+            foreach (Slot slot in table.slots) slot.Draw(gameTime);
+            
+            //all this does is figure out where to center the refresh icon in relation to the draw slot
+            Rectangle refreshRect = new Rectangle((int)table.slots[0].Position.X + cardWidth / 2 - refreshMe.Width / 2,
+                (int)table.slots[0].Position.Y + cardHeight / 2 - refreshMe.Height / 2, refreshMe.Width, refreshMe.Height);
+
+            spriteBatch.Draw(refreshMe, refreshRect, Color.White);
+
+
+            foreach (Stack stack in table.stacks) {
+
+                foreach (Card card in stack.cards) card.Draw(gameTime);
+
+            }
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

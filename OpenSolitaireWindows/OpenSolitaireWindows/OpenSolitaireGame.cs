@@ -103,9 +103,11 @@ namespace OpenSolitaireMG {
 
             
             cardSlotTex = Content.Load<Texture2D>("assets/small/cardslot");
-            cardSlotTex2 = Content.Load<Texture2D>("assets/small/cardslot2");
             cardBackTex = Content.Load<Texture2D>("assets/small/green_back");
             refreshMe = Content.Load<Texture2D>("assets/refresh");
+
+
+            cardSlotTex2 = Content.Load<Texture2D>("assets/small/cardslot2");
 
             newGame = Content.Load<Texture2D>("assets/new_game");
             newGameRect = new Rectangle(300, 30, newGame.Width, newGame.Height);
@@ -397,6 +399,7 @@ namespace OpenSolitaireMG {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
+
             GraphicsDevice.Clear(Color.SandyBrown);
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix());
