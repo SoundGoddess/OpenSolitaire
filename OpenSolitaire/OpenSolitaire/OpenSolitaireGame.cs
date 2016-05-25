@@ -114,13 +114,8 @@ namespace OpenSolitaire {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            foreach (Slot slot in table.slots) slot.Update(gameTime);
 
-            foreach (Stack stack in table.stacks) {
-
-                foreach (Card card in stack.cards) card.Update(gameTime);
-
-            }
+            table.Update(gameTime);
 
             base.Update(gameTime);
         }

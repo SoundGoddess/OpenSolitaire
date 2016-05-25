@@ -39,7 +39,6 @@
     <ApplicationIcon>Spade.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CardEvents.cs" />
     <Compile Include="CardTable.cs" />
     <Compile Include="OpenSolitaireGame.cs" />
     <Compile Include="Program.cs" />
