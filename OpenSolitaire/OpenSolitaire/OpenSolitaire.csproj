@@ -100,6 +100,7 @@
     <Content Include="Content\hearts_J.png" />
     <Content Include="Content\hearts_K.png" />
     <Content Include="Content\hearts_Q.png" />
+    <Content Include="Content\new_game.png" />
     <Content Include="Content\refresh.png" />
     <Content Include="Content\Spade.ico" />
     <Content Include="Content\spades_10.png" />

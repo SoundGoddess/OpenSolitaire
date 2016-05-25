@@ -24,17 +24,21 @@ namespace OpenSolitaire {
         BoxingViewportAdapter viewport;
 
         const int WindowWidth = 1035;
-        const int WindowHeight = 750;
+        const int WindowHeight = 600;
 
         const int spacer = 10;
         const int cardWidth = 125;
         const int cardHeight = 156;
-
-        Texture2D cardSlot, cardBack, refreshMe;
+        
+        Texture2D cardSlot, cardBack, refreshMe, newGame;
+        Rectangle newGameRect;
+        Color newGameColor;
         
         CardTable table;
 
         DragonDrop<IDragonDropItem> dragonDrop;
+        
+        private MouseState prevMouseState;
 
         public OpenSolitaireGame() {
 
@@ -76,14 +80,17 @@ namespace OpenSolitaire {
             cardSlot = Content.Load<Texture2D>("card_slot");
             cardBack = Content.Load<Texture2D>("card_back_green");
             refreshMe = Content.Load<Texture2D>("refresh");
+            newGame = Content.Load<Texture2D>("new_game");
 
             dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
 
             // table creates a fresh table.deck
-            table = new CardTable(dragonDrop, cardBack, cardSlot, 10, 10);
+            table = new CardTable(dragonDrop, cardBack, cardSlot, 0, 30);
+
+            table.InitializeTable();
 
             // load up the card assets for the new deck
-            foreach (Card card in table.deck.cards) {
+            foreach (Card card in table.drawPile.cards) {
 
                 string location = card.suit.ToString() + card.rank.ToString();
                 card.SetTexture(Content.Load<Texture2D>(location));
@@ -91,7 +98,6 @@ namespace OpenSolitaire {
             }
 
             table.SetTable();
-
             
             Components.Add(dragonDrop);
 
@@ -115,8 +121,43 @@ namespace OpenSolitaire {
                 Exit();
 
 
-            table.Update(gameTime);
+            MouseState mouseState = Mouse.GetState();
+            Point point = viewport.PointToScreen(mouseState.X, mouseState.Y);
 
+            if (table.isSetup && !table.isAnimating) { 
+
+                newGameRect = new Rectangle(310, 20, newGame.Width, newGame.Height);
+                newGameColor = Color.White;
+
+
+                if (newGameRect.Contains(point)) {
+
+                    newGameColor = Color.Aqua;
+
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+
+                        table.Clear();
+
+
+                        // load up the card assets for the new deck
+                        foreach (Card card in table.drawPile.cards) {
+
+                            string location = card.suit.ToString() + card.rank.ToString();
+                            card.SetTexture(Content.Load<Texture2D>(location));
+
+                        }
+
+                        table.SetTable();
+
+                    }
+                }
+
+            }
+
+            prevMouseState = mouseState;
+
+
+            table.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -138,13 +179,40 @@ namespace OpenSolitaire {
 
             spriteBatch.Draw(refreshMe, refreshRect, Color.White);
 
+            spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
-            foreach (Stack stack in table.stacks) {
+            if (table.isSetup) {
 
-                foreach (Card card in stack.cards) card.Draw(gameTime);
+                foreach (Stack stack in table.stacks) {
 
+                    foreach (Card card in stack.cards_Zsort) card.Draw(gameTime);
+
+                }
+
+
+                foreach (Card card in table.drawPile.cards_Zsort) card.Draw(gameTime);
+                foreach (Card card in table.discardPile.cards_Zsort) card.Draw(gameTime);
+
+
+                // fix the Z-ordering
+                foreach (var item in dragonDrop.Items) {
+
+                    var type = item.GetType();
+
+                    if (type == typeof(Card)) {
+
+                        Card card = (Card)item;
+
+                        if (card.IsSelected || card.returnToOrigin) {
+
+                            card.Draw(gameTime);
+
+                        }
+
+                    }
+
+                }
             }
-
             spriteBatch.End();
 
             base.Draw(gameTime);

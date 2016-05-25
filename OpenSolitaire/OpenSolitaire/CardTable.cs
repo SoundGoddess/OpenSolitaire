@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
@@ -18,93 +19,102 @@ namespace OpenSolitaire {
 
     public class CardTable : Table {
 
-        public Deck deck;
+        public Deck drawPile { get; set; }
+        public Deck discardPile { get; set; }
+        
+        public bool isSetup = false;
+        public bool isAnimating = false;
 
-        private Stack animateMe;
+        private Slot _drawSlot, _discardSlot;
 
-        private bool isSetup = false;
+        private MouseState prevMouseState;
+
+        public Slot drawSlot { get { return _drawSlot; } }
+        public Slot discardSlot { get { return _discardSlot; } }
 
         public CardTable(DragonDrop<IDragonDropItem> dd, Texture2D cardback, Texture2D slot, int stackOffsetH, int stackOffsetV)
             : base(dd, cardback, slot, stackOffsetH, stackOffsetV) {
 
             // create a fresh card deck
-            deck = new Deck(cardback, dd.spriteBatch);
-            deck.freshDeck();
-            deck.shuffle();
+            drawPile = new Deck(cardback, dd.spriteBatch);
+            drawPile.freshDeck();
+            drawPile.type = StackType.deck;
+
+
+            discardPile = new Deck(cardback, dd.spriteBatch);
+            discardPile.type = StackType.discard;
 
         }
 
-        public new void SetTable(bool resetTable = false) {
 
-            if (resetTable) {
-                Clear();
-                deck.freshDeck();
-                deck.shuffle();
+        public new void Clear() {
+
+            foreach (Stack stack in stacks) {
+                foreach (Card card in stack.cards) _dragonDrop.Remove(card);
+                stack.Clear();
             }
 
-            else {
 
-                int x = 20;
-                int y = 20;
+            stacks.Clear();
 
-                Slot drawSlot = new Slot(_slot, _spriteBatch, new Vector2(x, y));
-                Slot discardSlot = new Slot(_slot, _spriteBatch, new Vector2(x * 2 + _slot.Width, y));
+            drawPile.freshDeck();
 
-                AddSlot(drawSlot);
-                AddSlot(discardSlot);
+        }
 
-                y += _slot.Height + y;
+        public void InitializeTable() {
 
 
-                animateMe = new Stack(_cardBack, _spriteBatch);
+            int x = 20;
+            int y = 20;
 
-                for (int i = 0; i < 7; i++) {
+            Slot drawSlot = new Slot(_slot, _spriteBatch, new Vector2(x, y));
+            Slot discardSlot = new Slot(_slot, _spriteBatch, new Vector2(x * 2 + _slot.Width, y));
 
-                    Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
-                    AddSlot(newSlot);
+            drawSlot.type = SlotType.draw;
+            discardSlot.type = SlotType.discard;
 
-                    Card moveCard = deck.drawCard();
-                    moveCard.origin = newSlot.Position;
-                    moveCard.ZIndex += ON_TOP + i;
-                    moveCard.returnToOrigin = true;
-                    moveCard.snapSpeed = 4.0f;
-                    moveCard.IsDraggable = false;
-                    animateMe.addCard(moveCard);
+            AddSlot(drawSlot);
+            AddSlot(discardSlot);
 
-                    for (int j = 1; j < i + 1; j++) {
+            _drawSlot = drawSlot;
+            _discardSlot = discardSlot;
 
-                        moveCard = deck.drawCard();
-                        moveCard.origin = new Vector2(newSlot.Position.X, newSlot.Position.Y + (_stackOffsetVertical * j));
-                        moveCard.ZIndex += ON_TOP + i + j;
-                        moveCard.returnToOrigin = true;
-                        moveCard.snapSpeed = 4.0f;
-                        moveCard.IsDraggable = false;
-                        animateMe.addCard(moveCard);
+            y += _slot.Height + y;
 
-                    }
 
-                }
+            // set up second row of slots
+            for (int i = 0; i < 7; i++) {
 
-                AddStack(animateMe);
-
-                y = 20;
-
-                for (int i = 6; i >= 3; i--) {
-
-                    Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
-                    AddSlot(newSlot);
-
-                }
-
-                isSetup = true;
+                Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
+                newSlot.type = SlotType.stack;
+                AddSlot(newSlot);
 
             }
 
-            // set up the board
-            foreach (Card card in deck.cards) {
 
+            y = 20;
+
+            // set up play/score slots
+            for (int i = 6; i >= 3; i--) {
+
+                Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
+                newSlot.type = SlotType.play;
+                AddSlot(newSlot);
+
+            }
+
+        }
+
+        public new void SetTable() {
+            
+            int x = 20;
+            int y = 20;
+
+            drawPile.shuffle();
+
+            foreach (Card card in drawPile.cards) {
+                
                 if (!card.returnToOrigin) { 
-                    card.IsDraggable = true;
                     card.Position = slots[0].Position;
                     card.origin = card.Position;
                     card.Selected += OnCardSelected;
@@ -112,33 +122,41 @@ namespace OpenSolitaire {
                 }
             }
 
-            AddStack(deck);
+            AddStack(drawPile);
+            AddStack(discardPile);
 
-            /*
+            
+            y += _slot.Height + y;
             
             for (int i = 0; i < 7; i++) {
                 
-                Card moveCard = deck.drawCard();
-                moveCard.origin = slots[i].Position;
-                moveCard.ZIndex += ON_TOP;
+                Stack stack = new Stack(_cardBack, _spriteBatch);
+                stack.type = StackType.stack;
+                Vector2 pos = new Vector2(x + x * i + _slot.Width * i, y);
+                Card moveCard = drawPile.drawCard();
+                moveCard.origin = pos;
                 moveCard.returnToOrigin = true;
-                
+                moveCard.snapSpeed = 4.0f;
+                moveCard.IsDraggable = false;
+                stack.addCard(moveCard);
+
                 for (int j = 1; j < i + 1; j++) {
 
-                    moveCard = deck.drawCard();
-                    moveCard.origin = new Vector2(slots[i].Position.X, slots[i].Position.Y + (_stackOffsetVertical * j));
+                    moveCard = drawPile.drawCard();
+                    moveCard.origin = new Vector2(pos.X, pos.Y + (_stackOffsetVertical * j));
                     moveCard.returnToOrigin = true;
+                    moveCard.snapSpeed = 4.0f;
+                    moveCard.IsDraggable = false;
+                    stack.addCard(moveCard);
 
                 }
 
+                AddStack(stack);
+
             }
 
-            Card moveCard = deck.drawCard();
-            moveCard.origin = slots[i].Position;
-            moveCard.ZIndex += ON_TOP;
-            moveCard.returnToOrigin = true;
-            */
-
+            isSetup = true;
+            
         }
 
         private void OnCardSelected(object sender, EventArgs eventArgs) {
@@ -147,7 +165,7 @@ namespace OpenSolitaire {
 
             if (card.IsDraggable) {
                 card.IsSelected = true;
-                card.ZIndex += ON_TOP;
+                isAnimating = true;
             }
 
         }
@@ -158,85 +176,96 @@ namespace OpenSolitaire {
             card.IsSelected = false;
 
             if (card.Position != card.origin) card.returnToOrigin = true;
-        }
-
-
-        bool AnimateSprite(ref Card sprite, Vector2 destination) {
-
-            bool hasArrived = false;
-
-            if (sprite.Position == destination) {
-                hasArrived = true;
-                sprite.ZIndex = -ON_TOP;
-            }
-            else {
-
-                var pos = sprite.Position;
-                float speed = 5.0f;
-
-                float distance = (float)Math.Sqrt(Math.Pow(destination.X - pos.X, 2) + (float)Math.Pow(destination.Y - pos.Y, 2));
-                float directionX = (destination.X - pos.X) / distance;
-                float directionY = (destination.Y - pos.Y) / distance;
-
-                pos.X += directionX * speed;
-                pos.Y += directionY * speed;
-
-
-                if (Math.Sqrt(Math.Pow(pos.X - sprite.Position.X, 2) + Math.Pow(pos.Y - sprite.Position.Y, 2)) >= distance) {
-
-                    sprite.Position = destination;
-
-                    hasArrived = true;
-
-                    sprite.ZIndex = -ON_TOP;
-
-                }
-                else sprite.Position = pos;
-            }
-
-            return hasArrived;
 
         }
 
+        
         public void Update(GameTime gameTime) {
 
-            foreach (Slot slot in this.slots) slot.Update(gameTime);
+            if (isSetup) {
 
-            foreach (Stack stack in this.stacks) {
+                foreach (Slot slot in this.slots) slot.Update(gameTime);
 
-                foreach (Card card in stack.cards) card.Update(gameTime);
+                foreach (Stack stack in this.stacks) {
 
-            }
+                    isAnimating = false;
 
-            /*
-            if (isSetup) { 
-                int animationCount = 0;
+                    foreach (Card card in stack.cards) {
+                        if (card.returnToOrigin) isAnimating = true;
+                        card.Update(gameTime);
+                    }
+                
+                }
 
-                // animates dealing from the draw pile to set up the board
-                if (animationQueue.Count > 0) {
-                    for (int i = 1; i < animationQueue.Count + 1; i++) {
 
-                        Card sprite = deck.cards;
+                foreach (Stack stack in this.stacks) {
 
-                        bool hasArrived = AnimateSprite(ref sprite, animationQueue[i - 1]);
+                    if (!isAnimating && (stack.type == StackType.stack)) {
 
-                        if (hasArrived) {
-                            animationCount++;
+                        if (stack.Count > 0) {
+
+                            Card topCard = stack.cards[stack.Count - 1];
+
+                            if (!topCard.isFaceUp) {
+                                topCard.flipCard();
+                                topCard.IsDraggable = true;
+                                topCard.snapSpeed = 25f;
+                            }
+
                         }
 
                     }
-                }
-
-                if (animationCount == animationQueue.Count) {
-                
-                    animationQueue.Clear();
 
                 }
+
             }
 
-        */
 
+            if (isSetup && !isAnimating) {
 
+                MouseState mouseState = Mouse.GetState();
+                Point point = _dragonDrop.viewport.PointToScreen(mouseState.X, mouseState.Y);
+
+                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+
+                    if (drawSlot.Border.Contains(point)) {
+
+                        if (drawPile.Count > 0) {
+
+                            foreach (Card disCard in discardPile.cards) {
+                                disCard.IsDraggable = false;
+                            }
+                            
+                            Card card = drawPile.drawCard();
+                            card.Position = discardSlot.Position;
+                            card.flipCard();
+                            card.origin = card.Position;
+                            card.IsDraggable = true;
+                            discardPile.addCard(card);
+
+                        }
+                        else if (drawPile.Count == 0) {
+
+                            while (discardPile.Count > 0) {
+
+                                Card disCard = discardPile.drawCard();
+
+                                disCard.flipCard();
+                                disCard.Position = drawSlot.Position;
+                                disCard.origin = drawSlot.Position;
+                                disCard.IsDraggable = false;
+
+                                drawPile.addCard(disCard);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+                prevMouseState = mouseState;
+            }
         }
 
     }
