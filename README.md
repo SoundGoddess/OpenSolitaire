@@ -1,11 +1,11 @@
 # OpenSolitaire
 Solitaire Games for MonoGame and Unity
 
-##[Get Started](https://github.com/SoundGoddess/OpenSolitaire/releases)
+##[Downloads](https://github.com/SoundGoddess/OpenSolitaire/releases)
 
 ##Changelog
 
-**5/25/2016 -** Released Alpha 1.
+**5/25/2016 -** Released Alpha 1.  The game is stable and playable, but there are several GUI glitches that make it buggy.
 
 **5/8/2016 -** I created a new project for drag-and-drop in MonoGame since I couldn't find many examples that made any sense to me.  I just released version 1.0 of that code here: [https://github.com/SoundGoddess/MonoGameDragAndDrop](https://github.com/SoundGoddess/MonoGameDragAndDrop).  What I learn from that project will be implemented into this project when I get around to it.
 
