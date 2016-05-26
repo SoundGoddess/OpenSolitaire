@@ -255,4 +255,7 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-OpenSolitaireMac.zip
+
+publish/
+
+old/
