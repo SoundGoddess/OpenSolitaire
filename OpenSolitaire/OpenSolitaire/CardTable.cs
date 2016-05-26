@@ -26,6 +26,7 @@ namespace OpenSolitaire {
         public bool isAnimating = false;
 
         private Slot _drawSlot, _discardSlot;
+        private List<Stack> playStacks = new List<Stack>();
 
         private MouseState prevMouseState;
 
@@ -49,14 +50,12 @@ namespace OpenSolitaire {
 
         public new void Clear() {
 
-            foreach (Stack stack in stacks) {
-                foreach (Card card in stack.cards) _dragonDrop.Remove(card);
-                stack.Clear();
+            foreach (Slot slot in slots) {
+                foreach (Card card in slot.stack.cards) _dragonDrop.Remove(card);
+                slot.stack.Clear();
             }
 
-
-            stacks.Clear();
-
+            
             drawPile.freshDeck();
 
         }
@@ -67,11 +66,13 @@ namespace OpenSolitaire {
             int x = 20;
             int y = 20;
 
-            Slot drawSlot = new Slot(_slot, _spriteBatch, new Vector2(x, y));
-            Slot discardSlot = new Slot(_slot, _spriteBatch, new Vector2(x * 2 + _slot.Width, y));
+            Slot drawSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x, y));
+            Slot discardSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x * 2 + _slotTex.Width, y));
 
-            drawSlot.type = SlotType.draw;
-            discardSlot.type = SlotType.discard;
+            drawSlot.stack = drawPile;
+            discardSlot.stack = discardPile;
+            drawSlot.type = StackType.draw;
+            discardSlot.type = StackType.discard;
 
             AddSlot(drawSlot);
             AddSlot(discardSlot);
@@ -79,14 +80,15 @@ namespace OpenSolitaire {
             _drawSlot = drawSlot;
             _discardSlot = discardSlot;
 
-            y += _slot.Height + y;
+            y += _slotTex.Height + y;
 
 
             // set up second row of slots
             for (int i = 0; i < 7; i++) {
 
-                Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
-                newSlot.type = SlotType.stack;
+                Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
+                newSlot.type = StackType.stack;
+                newSlot.stack.method = StackMethod.vertical;
                 AddSlot(newSlot);
 
             }
@@ -97,12 +99,14 @@ namespace OpenSolitaire {
             // set up play/score slots
             for (int i = 6; i >= 3; i--) {
 
-                Slot newSlot = new Slot(_slot, _spriteBatch, new Vector2(x + x * i + _slot.Width * i, y));
-                newSlot.type = SlotType.play;
+                Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
+                newSlot.type = StackType.play;
                 AddSlot(newSlot);
-
+                
+                playStacks.Add(newSlot.stack);
+                
             }
-
+                        
         }
 
         public new void SetTable() {
@@ -119,44 +123,87 @@ namespace OpenSolitaire {
                     card.origin = card.Position;
                     card.Selected += OnCardSelected;
                     card.Deselected += OnCardDeselected;
+                    card.Collusion += OnCollusion;
                 }
             }
-
-            AddStack(drawPile);
-            AddStack(discardPile);
-
             
-            y += _slot.Height + y;
+            
+            y += _slotTex.Height + y;
             
             for (int i = 0; i < 7; i++) {
                 
-                Stack stack = new Stack(_cardBack, _spriteBatch);
-                stack.type = StackType.stack;
-                Vector2 pos = new Vector2(x + x * i + _slot.Width * i, y);
+                Vector2 pos = new Vector2(x + x * i + _slotTex.Width * i, y);
                 Card moveCard = drawPile.drawCard();
                 moveCard.origin = pos;
                 moveCard.returnToOrigin = true;
-                moveCard.snapSpeed = 4.0f;
+                moveCard.snapSpeed = 6.0f;
                 moveCard.IsDraggable = false;
-                stack.addCard(moveCard);
+                slots[i+2].stack.addCard(moveCard);
 
                 for (int j = 1; j < i + 1; j++) {
 
                     moveCard = drawPile.drawCard();
                     moveCard.origin = new Vector2(pos.X, pos.Y + (_stackOffsetVertical * j));
                     moveCard.returnToOrigin = true;
-                    moveCard.snapSpeed = 4.0f;
+                    moveCard.snapSpeed = 6.0f;
                     moveCard.IsDraggable = false;
-                    stack.addCard(moveCard);
+                    slots[i+2].stack.addCard(moveCard);
+
+                }
+                
+
+            }
+            
+            isSetup = true;
+            
+        }
+        
+
+        private void OnCollusion(object sender, CollusionEvent e) {
+
+            Card card = (Card)sender;
+
+            Console.WriteLine("card: " + card.suit + card.rank);
+
+            var type = e.item.GetType();
+
+            if (type == typeof(Card)) {
+                
+                Card destination = (Card)e.item;
+
+                if (destination.isFaceUp) {
+
+                    Console.WriteLine("destination card: " + destination.suit + destination.rank);
+                    
+                    // apparently the collusion isn't always in the expected order so just check both conditions
+                    if (card.color != destination.color) {
+
+                        if ((destination.stack.type == StackType.stack) && (card.rank == (destination.rank - 1))) card.SetParent(destination);
+                        else if ((card.stack.type == StackType.stack) && (card.rank == (destination.rank + 1))) destination.SetParent(card);
+                        
+
+                    }
+                    else {
+
+                        if ((destination.stack.type == StackType.play) && (card.rank == (destination.rank + 1))) card.SetParent(destination);
+                        else if ((card.stack.type == StackType.play) && (card.rank == (destination.rank - 1))) destination.SetParent(card);
+
+                    }
 
                 }
 
-                AddStack(stack);
+            }
+            else if (type == typeof(Slot)) {
+
+                Slot slot = (Slot)e.item;
+
+                if (slot.type == StackType.play && slot.stack.Count == 0 && card.rank == Rank._A) card.MoveStack(slot.stack);
+                if (slot.type == StackType.stack && slot.stack.Count == 0 && card.rank == Rank._K) card.MoveStack(slot.stack);
+
+                Console.WriteLine("slot: " + slot.type);
 
             }
 
-            isSetup = true;
-            
         }
 
         private void OnCardSelected(object sender, EventArgs eventArgs) {
@@ -184,13 +231,13 @@ namespace OpenSolitaire {
 
             if (isSetup) {
 
-                foreach (Slot slot in this.slots) slot.Update(gameTime);
+                isAnimating = false;
 
-                foreach (Stack stack in this.stacks) {
+                foreach (Slot slot in slots) { 
 
-                    isAnimating = false;
+                    slot.Update(gameTime);
 
-                    foreach (Card card in stack.cards) {
+                    foreach (Card card in slot.stack.cards) {
                         if (card.returnToOrigin) isAnimating = true;
                         card.Update(gameTime);
                     }
@@ -198,13 +245,13 @@ namespace OpenSolitaire {
                 }
 
 
-                foreach (Stack stack in this.stacks) {
+                foreach (Slot slot in slots) {
 
-                    if (!isAnimating && (stack.type == StackType.stack)) {
+                    if (!isAnimating && (slot.type == StackType.stack)) {
 
-                        if (stack.Count > 0) {
+                        if (slot.stack.Count > 0) {
 
-                            Card topCard = stack.cards[stack.Count - 1];
+                            Card topCard = slot.stack.cards[slot.stack.Count - 1];
 
                             if (!topCard.isFaceUp) {
                                 topCard.flipCard();
@@ -231,7 +278,7 @@ namespace OpenSolitaire {
                     if (drawSlot.Border.Contains(point)) {
 
                         if (drawPile.Count > 0) {
-
+                            
                             foreach (Card disCard in discardPile.cards) {
                                 disCard.IsDraggable = false;
                             }

@@ -95,6 +95,8 @@ namespace OpenSolitaire {
                 string location = card.suit.ToString() + card.rank.ToString();
                 card.SetTexture(Content.Load<Texture2D>(location));
 
+                dragonDrop.Add(card);
+
             }
 
             table.SetTable();
@@ -145,6 +147,8 @@ namespace OpenSolitaire {
                             string location = card.suit.ToString() + card.rank.ToString();
                             card.SetTexture(Content.Load<Texture2D>(location));
 
+                            dragonDrop.Add(card);
+
                         }
 
                         table.SetTable();
@@ -183,9 +187,9 @@ namespace OpenSolitaire {
 
             if (table.isSetup) {
 
-                foreach (Stack stack in table.stacks) {
+                foreach (Slot slot in table.slots) {
 
-                    foreach (Card card in stack.cards_Zsort) card.Draw(gameTime);
+                    foreach (Card card in slot.stack.cards_Zsort) card.Draw(gameTime);
 
                 }
 
@@ -206,6 +210,11 @@ namespace OpenSolitaire {
                         if (card.IsSelected || card.returnToOrigin) {
 
                             card.Draw(gameTime);
+
+                            while (card.Child != null) {
+                                card = card.Child;
+                                card.Draw(gameTime);
+                            }
 
                         }
 
