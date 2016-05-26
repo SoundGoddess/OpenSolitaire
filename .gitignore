@@ -257,4 +257,5 @@ ModelManifest.xml
 .fake/
 
 publish/
-*.zip
+
+OpenSolitaireWindows/
