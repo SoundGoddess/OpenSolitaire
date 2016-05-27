@@ -1,5 +1,6 @@
 ###Source Code: 
 OpenSolitaire - [Copyright (c) 2016 HathorsLove.com (GPL-3)](http://www.gnu.org/licenses/gpl-3.0.html)
+
 MonoGame.Ruge - [Copyright (c) 2016 MetaSmug (MIT)](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md)
 
 ####MonoGame:
