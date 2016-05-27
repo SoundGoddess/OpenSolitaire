@@ -49,7 +49,7 @@ namespace OpenSolitaire {
             graphics.PreferredBackBufferWidth = WindowWidth;
             graphics.PreferredBackBufferHeight = WindowHeight;
 
-            this.Window.Title = "Open Solitaire";
+            this.Window.Title = "Open Solitaire Classic";
             this.Window.AllowUserResizing = true;
 
             IsMouseVisible = true;

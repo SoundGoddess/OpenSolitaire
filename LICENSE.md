@@ -1,22 +1,16 @@
 ###Source Code: 
-[Copyright (c) 2016 HathorsLove.com (GPL-3)](http://www.gnu.org/licenses/gpl-3.0.html)
+OpenSolitaire - [Copyright (c) 2016 HathorsLove.com (GPL-3)](http://www.gnu.org/licenses/gpl-3.0.html)
+MonoGame.Ruge - [Copyright (c) 2016 MetaSmug (MIT)](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md)
 
 ####MonoGame:
 [Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt)
 
-####Empty Keys:
-[Copyright (c) 2014 Empty Keys, Filip Dušek](http://www.emptykeys.com)
-
-[Copyright (c) 2015 Microsoft](https://github.com/Microsoft/XamlBehaviors)
 
 ###Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
 CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))
 
-###Audio Assets:
-Public Domain (mostly from [sonniss.com](sonniss.com))
-
-###Music: 
+###Audio and Music: 
 
 [**Attribution-NonCommercial 4.0 International**](http://creativecommons.org/licenses/by-nc/4.0/)
 
