@@ -9,7 +9,7 @@ MonoGame.Ruge - [Copyright (c) 2016 MetaSmug](https://github.com/MetaSmug/RollYo
 ###Graphics:
 
 ####Branding Logo:
-Copyright (c) 2016 MetaSmug, all rights reserved.  If you fork your own game, please remove this branding before distributing it.
+Copyright (c) 2016 MetaSmug, all rights reserved.  If you're not submitting Pull Requests to [this repo](https://github.com/SoundGoddess/OpenSolitaire/) then please remove before distributing your game.
 
 ####Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
