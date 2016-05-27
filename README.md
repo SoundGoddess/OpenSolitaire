@@ -1,5 +1,5 @@
-# OpenSolitaire
-Solitaire Games for MonoGame and Unity
+# Open Solitaire Classic
+Classic Solitaire for Windows, Mac, and Linux
 
 ##[Downloads](https://github.com/SoundGoddess/OpenSolitaire/releases)
 
