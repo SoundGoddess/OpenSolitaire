@@ -77,8 +77,9 @@ namespace MonoGame.Ruge.CardEngine {
         public float snapSpeed { get; set; } = 25.0f;
         public bool returnToOrigin { get; set; } = false;
         protected const int ON_TOP = 1000;
-
+        
         public Stack stack { get; set; }
+        public int stackIndex { get; set; } = 0;
 
         public Rectangle Border {
             get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
@@ -137,9 +138,6 @@ namespace MonoGame.Ruge.CardEngine {
             isFaceUp = !isFaceUp;
         }
 
-        public void Draw(GameTime gameTime) {
-            _spriteBatch.Draw(Texture, Position, Color.White);
-        }
 
         public void SetTexture(Texture2D texture) { _texture = texture; }
 
@@ -176,24 +174,40 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void MoveStack(Stack newStack) {
 
+            foreach (Card card in stack.cards) {
+
+                // if you're the parent then it's my time to leave home :P
+                if (card.Child == this) card.Child = null;
+
+            }
+
             stack.cards.Remove(this);
             newStack.addCard(this);
             stack = newStack;
-            Position = stack.slot.Position;
-            origin = Position;
+
+            if (Child != null) {
+                Child.MoveStack(newStack);
+            }
 
         }
 
         public void SetParent(Card parent) {
 
             MoveStack(parent.stack);
-
-            Vector2 pos = new Vector2(parent.Position.X + stack.offset.X, parent.Position.Y + stack.offset.Y);
-
-            Position = pos;
-            origin = pos;
-
             parent.Child = this;
+            
+        }
+
+        private void CryingChild() {
+            
+            if (Child != null) {
+
+                Vector2 pos = new Vector2(Position.X + stack.offset.X, Position.Y + stack.offset.Y);
+                Child.Position = pos;
+                Child.origin = pos;
+                Child.ZIndex = ZIndex + 1;
+
+            }
 
         }
 
@@ -209,17 +223,7 @@ namespace MonoGame.Ruge.CardEngine {
         public event EventHandler Deselected;
         public void OnDeselected() { Deselected(this, EventArgs.Empty); }
         
-        public void OnPositionUpdate() {
-
-            if (Child != null) {
-
-                Vector2 pos = new Vector2(Position.X + stack.offset.X, Position.Y + stack.offset.Y);
-                Child.Position = pos;
-                Child.ZIndex = ZIndex + 1;
-
-            }
-
-        }
+        public void OnPositionUpdate() { CryingChild(); }
 
         public event EventHandler<CollusionEvent> Collusion;
 
@@ -236,8 +240,11 @@ namespace MonoGame.Ruge.CardEngine {
         #endregion
 
 
-        #region overrides
-        
+        #region MonoGame
+
+        public void Draw(GameTime gameTime) {
+            _spriteBatch.Draw(Texture, Position, Color.White);
+        }
 
         public void Update(GameTime gameTime) {
 

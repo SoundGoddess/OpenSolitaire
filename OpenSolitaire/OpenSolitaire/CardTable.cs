@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace OpenSolitaire {
+namespace OpenSolitaire.Classic {
 
     public class CardTable : Table {
 
@@ -73,6 +73,8 @@ namespace OpenSolitaire {
             discardSlot.stack = discardPile;
             drawSlot.type = StackType.draw;
             discardSlot.type = StackType.discard;
+            drawSlot.stack.name = "Draw";
+            discardSlot.stack.name = "Discard";
 
             AddSlot(drawSlot);
             AddSlot(discardSlot);
@@ -89,6 +91,7 @@ namespace OpenSolitaire {
                 Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
                 newSlot.type = StackType.stack;
                 newSlot.stack.method = StackMethod.vertical;
+                newSlot.stack.name = "Stack " + i;
                 AddSlot(newSlot);
 
             }
@@ -102,6 +105,8 @@ namespace OpenSolitaire {
                 Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
                 newSlot.type = StackType.play;
                 AddSlot(newSlot);
+
+                newSlot.stack.name = "Score " + i;
                 
                 playStacks.Add(newSlot.stack);
                 
@@ -161,46 +166,53 @@ namespace OpenSolitaire {
 
         private void OnCollusion(object sender, CollusionEvent e) {
 
-            Card card = (Card)sender;
-
-            Console.WriteLine("card: " + card.suit + card.rank);
 
             var type = e.item.GetType();
 
             if (type == typeof(Card)) {
+
+                Card card1, card2, card, destination;
                 
-                Card destination = (Card)e.item;
+                card1 = (Card)sender;
+                card2 = (Card)e.item;
 
-                if (destination.isFaceUp) {
 
-                    Console.WriteLine("destination card: " + destination.suit + destination.rank);
+                Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
+
+                // the secret sauce to getting this working ;)
+
+                if (card1.Position != card1.origin) {
+                    card = card1;
+                    destination = card2;
+                }
+                else {
+                    destination = card1;
+                    card = card2;
+                }
+
+                if (card.isFaceUp && destination.isFaceUp && destination == destination.stack.topCard()) {              
+                          
+                    Console.WriteLine(card.suit.ToString() + card.rank + " -> " + destination.suit + destination.rank);
+
+                    if (destination.stack.type == StackType.play && card.color == destination.color) card.SetParent(destination);
+                    else if (destination.stack.type == StackType.stack && card.color != destination.color) card.SetParent(destination);
                     
-                    // apparently the collusion isn't always in the expected order so just check both conditions
-                    if (card.color != destination.color) {
-
-                        if ((destination.stack.type == StackType.stack) && (card.rank == (destination.rank - 1))) card.SetParent(destination);
-                        else if ((card.stack.type == StackType.stack) && (card.rank == (destination.rank + 1))) destination.SetParent(card);
-                        
-
-                    }
-                    else {
-
-                        if ((destination.stack.type == StackType.play) && (card.rank == (destination.rank + 1))) card.SetParent(destination);
-                        else if ((card.stack.type == StackType.play) && (card.rank == (destination.rank - 1))) destination.SetParent(card);
-
-                    }
-
                 }
 
             }
             else if (type == typeof(Slot)) {
 
+
+                Card card = (Card)sender;
                 Slot slot = (Slot)e.item;
 
-                if (slot.type == StackType.play && slot.stack.Count == 0 && card.rank == Rank._A) card.MoveStack(slot.stack);
-                if (slot.type == StackType.stack && slot.stack.Count == 0 && card.rank == Rank._K) card.MoveStack(slot.stack);
+                if (slot.stack.Count == 0) { 
 
-                Console.WriteLine("slot: " + slot.type);
+                    if (slot.type == StackType.play && card.rank == Rank._A && card.Child == null) card.MoveStack(slot.stack);
+                    if (slot.type == StackType.stack && card.rank == Rank._K) card.MoveStack(slot.stack);
+
+                    Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.type);
+                }
 
             }
 
@@ -229,6 +241,17 @@ namespace OpenSolitaire {
         
         public void Update(GameTime gameTime) {
 
+
+            foreach (Slot slot in slots) {
+
+                Card topCard = slot.stack.topCard();
+
+                if (topCard != null) topCard.IsDraggable = true;
+
+                slot.Update(gameTime);
+
+            }
+
             if (isSetup) {
 
                 isAnimating = false;
@@ -251,7 +274,7 @@ namespace OpenSolitaire {
 
                         if (slot.stack.Count > 0) {
 
-                            Card topCard = slot.stack.cards[slot.stack.Count - 1];
+                            Card topCard = slot.stack.topCard();
 
                             if (!topCard.isFaceUp) {
                                 topCard.flipCard();
@@ -313,6 +336,10 @@ namespace OpenSolitaire {
                 }
                 prevMouseState = mouseState;
             }
+
+
+
+
         }
 
     }

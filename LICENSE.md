@@ -5,7 +5,6 @@ MonoGame.Ruge - [Copyright (c) 2016 MetaSmug (MIT)](https://github.com/MetaSmug/
 ####MonoGame:
 [Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt)
 
-
 ###Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
 CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))

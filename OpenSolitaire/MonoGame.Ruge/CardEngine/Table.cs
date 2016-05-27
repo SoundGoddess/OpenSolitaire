@@ -51,6 +51,11 @@ namespace MonoGame.Ruge.CardEngine {
         public void Clear() { }
 
 
+        /// <summary>
+        /// override this to update the board
+        /// </summary>
+        public void Update() { }
+
     }
 
 }

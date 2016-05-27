@@ -5,6 +5,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
  
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,11 +13,13 @@ using MonoGame.Ruge.ViewportAdapters;
 using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
 
-namespace OpenSolitaire {
+
+
+namespace OpenSolitaire.Classic {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class OpenSolitaireGame : Game {
+    public class OpenSolitaireClassic : Game {
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -30,17 +33,18 @@ namespace OpenSolitaire {
         const int cardWidth = 125;
         const int cardHeight = 156;
         
-        Texture2D cardSlot, cardBack, refreshMe, newGame;
-        Rectangle newGameRect;
-        Color newGameColor;
+        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug;
+        Rectangle newGameRect, debugRect;
+        Color newGameColor, debugColor;
         
         CardTable table;
 
         DragonDrop<IDragonDropItem> dragonDrop;
         
         private MouseState prevMouseState;
+        private SpriteFont debugFont;
 
-        public OpenSolitaireGame() {
+        public OpenSolitaireClassic() {
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -81,6 +85,9 @@ namespace OpenSolitaire {
             cardBack = Content.Load<Texture2D>("card_back_green");
             refreshMe = Content.Load<Texture2D>("refresh");
             newGame = Content.Load<Texture2D>("new_game");
+            metaSmug = Content.Load<Texture2D>("smug-logo");
+            debug = Content.Load<Texture2D>("debug");
+            debugFont = Content.Load<SpriteFont>("Arial");
 
             dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
 
@@ -156,6 +163,23 @@ namespace OpenSolitaire {
                     }
                 }
 
+#if DEBUG
+                debugRect = new Rectangle(310, 80, newGame.Width, newGame.Height);
+                debugColor = Color.White;
+
+
+                if (debugRect.Contains(point)) {
+
+                    debugColor = Color.Aqua;
+
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+
+                        foreach (Slot slot in table.slots) slot.stack.debug();
+
+                    }
+                }
+#endif
+
             }
 
             prevMouseState = mouseState;
@@ -173,7 +197,13 @@ namespace OpenSolitaire {
 
             GraphicsDevice.Clear(Color.SandyBrown);
 
+
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
+
+            Rectangle logoRect = new Rectangle(10, 540, metaSmug.Width, metaSmug.Height);
+
+            // todo: please comment out the line below if you're going to distribute the game
+            spriteBatch.Draw(metaSmug, logoRect, Color.White);
             
             foreach (Slot slot in table.slots) slot.Draw(gameTime);
             
@@ -185,17 +215,41 @@ namespace OpenSolitaire {
 
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
+
+#if DEBUG
+
+            int x = 20;
+            int y = cardSlot.Height + 23;
+
+            // show the slot number for easier debugging
+            for (int i = 0; i < 7; i++) {
+                Vector2 vect = new Vector2(x + x * i + cardSlot.Width * i, y);
+                vect.X += cardSlot.Width / 2;
+                spriteBatch.DrawString(debugFont, i.ToString(), vect, Color.Black);
+            }
+
+            y = 5;
+
+            for (int i = 6; i >= 3; i--) {
+                Vector2 vect = new Vector2(x + x * i + cardSlot.Width * i, y);
+                vect.X += cardSlot.Width / 2;
+                spriteBatch.DrawString(debugFont, i.ToString(), vect, Color.Black);
+            }
+
+            spriteBatch.Draw(debug, debugRect, debugColor);
+#endif
+
             if (table.isSetup) {
 
                 foreach (Slot slot in table.slots) {
 
-                    foreach (Card card in slot.stack.cards_Zsort) card.Draw(gameTime);
+                    slot.stack.Draw(gameTime);
+                  //  foreach (Card card in slot.stack.cards_Zsort) card.Draw(gameTime);
 
                 }
 
-
-                foreach (Card card in table.drawPile.cards_Zsort) card.Draw(gameTime);
-                foreach (Card card in table.discardPile.cards_Zsort) card.Draw(gameTime);
+                //foreach (Card card in table.drawPile.cards_Zsort) card.Draw(gameTime);
+                //foreach (Card card in table.discardPile.cards_Zsort) card.Draw(gameTime);
 
 
                 // fix the Z-ordering

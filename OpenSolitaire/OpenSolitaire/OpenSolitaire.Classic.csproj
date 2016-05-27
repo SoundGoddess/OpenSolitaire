@@ -68,7 +68,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CardTable.cs" />
-    <Compile Include="OpenSolitaireGame.cs" />
+    <Compile Include="OpenSolitaireClassic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -102,6 +102,7 @@
     <Content Include="Content\clubs_J.png" />
     <Content Include="Content\clubs_K.png" />
     <Content Include="Content\clubs_Q.png" />
+    <Content Include="Content\debug.png" />
     <Content Include="Content\diamonds_10.png" />
     <Content Include="Content\diamonds_2.png" />
     <Content Include="Content\diamonds_3.png" />
@@ -130,6 +131,7 @@
     <Content Include="Content\hearts_Q.png" />
     <Content Include="Content\new_game.png" />
     <Content Include="Content\refresh.png" />
+    <Content Include="Content\smug-logo.png" />
     <Content Include="Content\Spade.ico" />
     <Content Include="Content\spades_10.png" />
     <Content Include="Content\spades_2.png" />
@@ -155,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Content\Arial.spritefont" />
     <None Include="OpenSolitaire_TemporaryKey.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
