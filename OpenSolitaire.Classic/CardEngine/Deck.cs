@@ -6,19 +6,15 @@ Licensed under MIT (see License.txt)
  */
 
 using System;
-using System.Threading;
+using MonoGame.Ruge.DragonDrop;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Ruge.CardEngine {
 
     public class Deck : Stack {
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        /// <param name="cardBack"></param>
-        /// <param name="sb"></param>
-        public Deck(Texture2D cardBack, SpriteBatch sb) : base(cardBack, sb) {
+        public Deck(Texture2D cardBack, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) : base(cardBack, spriteBatch, stackOffsetH, stackOffsetV) {
 
             type = StackType.deck;
 
@@ -51,7 +47,7 @@ namespace MonoGame.Ruge.CardEngine {
 
             cards.Clear();
 
-            Deck subDeck = new Deck(cardBack, spriteBatch);
+            Deck subDeck = new Deck(cardBack, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
             subDeck.freshDeck();
             subDeck.shuffle();
 
@@ -66,9 +62,7 @@ namespace MonoGame.Ruge.CardEngine {
             subDeck = null;
 
         }
-        
 
 
     }
-
 }

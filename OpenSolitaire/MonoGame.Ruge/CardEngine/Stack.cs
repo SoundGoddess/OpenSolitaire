@@ -32,14 +32,13 @@ namespace MonoGame.Ruge.CardEngine {
 
     public class Stack {
 
-        protected SpriteBatch _spriteBatch;
+        protected SpriteBatch spriteBatch;
+        
+        public Texture2D cardBack;
+        
+        public List<Card> cards = new List<Card>();
 
-        protected Texture2D _cardBack;
-        public Texture2D cardBack { get { return _cardBack; } }
-
-        protected List<Card> _cards = new List<Card>();
-
-        protected int _stackOffsetHorizontal, _stackOffsetVertical;
+        protected int stackOffsetHorizontal, stackOffsetVertical;
         
         public string name { get; set; } = "Stack";
 
@@ -47,8 +46,8 @@ namespace MonoGame.Ruge.CardEngine {
             get {
 
                 switch (method) {
-                    case StackMethod.horizontal: return new Vector2(_stackOffsetHorizontal, 0);
-                    case StackMethod.vertical:   return new Vector2(0, _stackOffsetVertical);
+                    case StackMethod.horizontal: return new Vector2(stackOffsetHorizontal, 0);
+                    case StackMethod.vertical:   return new Vector2(0, stackOffsetVertical);
                     default:                     return Vector2.Zero;
                 }
             }
@@ -56,23 +55,8 @@ namespace MonoGame.Ruge.CardEngine {
 
         public Slot slot { get; set; }
 
-        public IEnumerable<Card> cards_Zsort {
-            get {
-
-                // since MonoGame renders sprites on top of each other based on the order they are called in the Draw() method, this
-                // little line of code sorts the sprite objects to take into consideration the ZIndex so that things render as expected.
-                _cards = _cards.OrderBy(z => z.ZIndex).ToList();
-
-                int i = 0;
-
-                foreach (var item in _cards) {
-                    item.stackIndex = i;
-                    i++;
-                    yield return item;
-                }
-
-            }
-        }
+        public IEnumerable<Card> cards_Zsort => cards.OrderBy(z => z.ZIndex).ToList();
+        public IEnumerable<Card> cards_Ssort => cards.OrderBy(s => s.stackIndex).ToList();
 
         /// <summary>
         /// just picks the top card on the stack and returns it
@@ -80,22 +64,18 @@ namespace MonoGame.Ruge.CardEngine {
         /// <returns></returns>
         public Card topCard() {
 
-            if (_cards.Count > 0) {
+            if (cards.Count > 0) {
 
-                _cards = _cards.OrderBy(s => s.stackIndex).ToList();
-                return _cards.Last();
+                cards = cards.OrderBy(s => s.stackIndex).ToList();
+                return cards.Last();
 
             }
             else { return null; }
 
         }
 
-        public List<Card> cards {
-            get { return _cards; }
 
-        }
-
-        public int Count { get { return _cards.Count; } }
+        public int Count => cards.Count;
 
         public StackType type = StackType.hand;
         public StackMethod method = StackMethod.normal;
@@ -104,18 +84,18 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void addCard(Card card) {
             card.stack = this;
-            _cards.Add(card);
+            cards.Add(card);
         }
-        public void Clear() { _cards.Clear(); }
+        public void Clear() { cards.Clear(); }
 
         private void OnStackChanged(object sender, EventArgs eventArgs) {
-            _cards.Remove((Card)sender);
+            cards.Remove((Card)sender);
         }
 
         public void SetOffset(int x, int y) {
 
-            _stackOffsetHorizontal = x;
-            _stackOffsetVertical = y;
+            stackOffsetHorizontal = x;
+            stackOffsetVertical = y;
 
         }
 
@@ -125,8 +105,8 @@ namespace MonoGame.Ruge.CardEngine {
         /// <param name="cardBack"></param>
         /// <param name="sb"></param>
         public Stack(Texture2D cardBack, SpriteBatch sb) {
-            _cardBack = cardBack;
-            _spriteBatch = sb;
+            this.cardBack = cardBack;
+            spriteBatch = sb;
         }
 
 
@@ -138,11 +118,11 @@ namespace MonoGame.Ruge.CardEngine {
         /// <returns>Card if found, null otherwise</returns>
         public Card playCard(Rank rank, Suit suit) {
 
-            foreach (Card card in cards) {
+            foreach (var card in cards) {
 
                 if ((card.rank == rank) && (card.suit == suit)) {
 
-                    _cards.Remove(card);
+                    cards.Remove(card);
                     return card;
 
                 }
@@ -161,9 +141,9 @@ namespace MonoGame.Ruge.CardEngine {
         /// <returns>Card if found, null otherwise</returns>
         public Card playCard(int cardIndex) {
 
-            if (cards.Contains(_cards[cardIndex])) {
-                Card card = _cards[cardIndex];
-                _cards.RemoveAt(cardIndex);
+            if (cards.Contains(cards[cardIndex])) {
+                var card = cards[cardIndex];
+                cards.RemoveAt(cardIndex);
                 return card;
             }
             else { return null; }
@@ -172,11 +152,11 @@ namespace MonoGame.Ruge.CardEngine {
 
 
         public void Draw(GameTime gameTime) {
-            foreach (Card card in cards_Zsort) card.Draw(gameTime);
+            foreach (var card in cards_Zsort) card.Draw(gameTime);
         }
 
         public void Update(GameTime gameTime) {
-            foreach (Card card in cards_Zsort) card.Update(gameTime);
+            foreach (var card in cards_Zsort) card.Update(gameTime);
         }
 
 
@@ -187,33 +167,28 @@ namespace MonoGame.Ruge.CardEngine {
         /// <returns></returns>
         public Card drawCard() {
 
-            if (_cards.Count > 0) {
+            if (cards.Count > 0) {
 
-                Card topCard = _cards[_cards.Count - 1];
-                _cards.RemoveAt(_cards.Count - 1);
+                var topCard = cards[cards.Count - 1];
+                cards.RemoveAt(cards.Count - 1);
                 return topCard;
 
             }
             else { return null; }
 
         }
-
-
-
-
-
-
+        
         public void shuffle() {
 
             //wait a few ms to avoid seed collusion
             Thread.Sleep(30);
 
-            Random rand = new Random();
-            for (int i = _cards.Count - 1; i > 0; i--) {
+            var rand = new Random();
+            for (int i = cards.Count - 1; i > 0; i--) {
                 int randomIndex = rand.Next(i + 1);
-                Card tempCard = _cards[i];
-                _cards[i] = _cards[randomIndex];
-                _cards[randomIndex] = tempCard;
+                var tempCard = cards[i];
+                cards[i] = cards[randomIndex];
+                cards[randomIndex] = tempCard;
             }
         }
 
@@ -223,7 +198,7 @@ namespace MonoGame.Ruge.CardEngine {
             Console.WriteLine("========");
             Console.WriteLine(name);
 
-            if (_cards.Count > 0) {
+            if (cards.Count > 0) {
 
                 Card top = topCard();
                 String strFaceUp = (top.faceUp ? "face up" : "face down");

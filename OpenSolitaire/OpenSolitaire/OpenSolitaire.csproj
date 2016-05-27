@@ -68,7 +68,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CardTable.cs" />
-    <Compile Include="OpenSolitaireClassic.cs" />
+    <Compile Include="OpenSolitaireGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

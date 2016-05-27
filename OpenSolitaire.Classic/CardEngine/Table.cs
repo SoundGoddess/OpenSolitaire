@@ -4,6 +4,7 @@
 Licensed under MIT (see License.txt)
 
  */
+
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,7 +22,7 @@ namespace MonoGame.Ruge.CardEngine {
         protected SpriteBatch spriteBatch;
         protected DragonDrop<IDragonDropItem> dragonDrop;
         
-        public List<Slot> slots = new List<Slot>();
+        public List<Stack> stacks = new List<Stack>();
 
         public Table(DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
             spriteBatch = dragonDrop.spriteBatch;
@@ -31,13 +32,15 @@ namespace MonoGame.Ruge.CardEngine {
             this.cardBack = cardBack;
             this.slotTex = slotTex;
         }
-
         
+
+        /*
         public void AddSlot(Slot slot) {
             slot.stack.SetOffset(stackOffsetHorizontal, stackOffsetVertical);
             slots.Add(slot);
             dragonDrop.Add(slot);
         }
+        */
 
 
         /// <summary>

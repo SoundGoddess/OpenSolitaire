@@ -52,9 +52,9 @@ namespace MonoGame.Ruge.CardEngine {
         public Suit suit;
 
         public bool isFaceUp = false;
-        public bool faceUp { get { return isFaceUp; } }
+        public bool faceUp => isFaceUp;
 
-        protected Texture2D _cardback, _texture;
+        protected Texture2D cardback, texture;
         private readonly SpriteBatch _spriteBatch;
 
         #region properties
@@ -81,9 +81,7 @@ namespace MonoGame.Ruge.CardEngine {
         public Stack stack { get; set; }
         public int stackIndex { get; set; } = 0;
 
-        public Rectangle Border {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
-        }
+        public Rectangle Border => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
         public bool Contains(Vector2 pointToCheck) {
             Point mouse = new Point((int)pointToCheck.X, (int)pointToCheck.Y);
@@ -98,21 +96,16 @@ namespace MonoGame.Ruge.CardEngine {
 
             get { return _position; }
 
-            set { _position = value; OnPositionUpdate(); }
+            set {
+                _position = value;
 
-        }
-
-
-        public Texture2D Texture {
-
-            get {
-
-                if (isFaceUp) return _texture;
-                else return _cardback;
-
+                if (IsSelected) OnPositionUpdate();
             }
 
         }
+
+
+        public Texture2D Texture => isFaceUp ? texture : cardback;
 
         #endregion
 
@@ -125,7 +118,7 @@ namespace MonoGame.Ruge.CardEngine {
             _spriteBatch = sb;
             this.rank = rank;
             this.suit = suit;
-            _cardback = cardback;
+            this.cardback = cardback;
 
         }
 
@@ -139,7 +132,7 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
 
-        public void SetTexture(Texture2D texture) { _texture = texture; }
+        public void SetTexture(Texture2D tex) => texture = tex;
 
         /// <summary>
         /// Animation for returning the card to its original position if it can't find a new place to snap to
@@ -147,7 +140,7 @@ namespace MonoGame.Ruge.CardEngine {
         /// <returns>returns true if the card is back in its original position; otherwise it increments the animation</returns>
         private bool ReturnToOrigin() {
 
-            bool backAtOrigin = false;
+            var backAtOrigin = false;
 
             var pos = Position;
             
@@ -174,7 +167,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void MoveStack(Stack newStack) {
 
-            foreach (Card card in stack.cards) {
+            foreach (var card in stack.cards) {
 
                 // if you're the parent then it's my time to leave home :P
                 if (card.Child == this) card.Child = null;
@@ -185,8 +178,31 @@ namespace MonoGame.Ruge.CardEngine {
             newStack.addCard(this);
             stack = newStack;
 
-            if (Child != null) {
-                Child.MoveStack(newStack);
+            if (stack.Count == 1) {
+
+                Position = stack.slot.Position;
+                origin = Position;
+
+            }
+            else {
+
+                foreach (var card in stack.cards) {
+
+                    // new parent sets the stack index
+                    if (card.Child == this) stackIndex = card.stackIndex + 1;
+
+                }
+            }
+            int newIndex = stackIndex + 1;
+
+            while (Child != null) {
+                
+                stack.cards.Remove(Child);
+                newStack.addCard(Child);
+                Child.stack = newStack;
+                Child.stackIndex = newIndex;
+                newIndex++;
+                Child = Child.Child;
             }
 
         }
@@ -195,17 +211,37 @@ namespace MonoGame.Ruge.CardEngine {
 
             MoveStack(parent.stack);
             parent.Child = this;
+
+            stackIndex = parent.stackIndex + 1;
+
+            int newIndex = stackIndex + 1;
+
+            while (Child != null) {
+                
+                Child.stackIndex = newIndex;
+                newIndex++;
+                Child = Child.Child;
+
+            }
             
         }
 
-        private void CryingChild() {
-            
-            if (Child != null) {
+        public void CryingChild() {
+
+            int newIndex = stackIndex + 1;
+
+            while (Child != null) {
 
                 Vector2 pos = new Vector2(Position.X + stack.offset.X, Position.Y + stack.offset.Y);
+
                 Child.Position = pos;
                 Child.origin = pos;
                 Child.ZIndex = ZIndex + 1;
+
+                Child.stackIndex = newIndex;
+                newIndex++;
+
+                Child = Child.Child;
 
             }
 
@@ -218,10 +254,29 @@ namespace MonoGame.Ruge.CardEngine {
         #region events
 
         public event EventHandler Selected;
-        public void OnSelected() { Selected(this, EventArgs.Empty); }
+
+        public void OnSelected() {
+            
+            if (IsDraggable) {
+                IsSelected = true;
+            }
+
+            Selected(this, EventArgs.Empty);
+
+
+        }
 
         public event EventHandler Deselected;
-        public void OnDeselected() { Deselected(this, EventArgs.Empty); }
+
+        public void OnDeselected() {
+            
+            if (Position != origin) returnToOrigin = true;
+            
+            IsSelected = false;
+
+            Deselected(this, EventArgs.Empty);
+
+        }
         
         public void OnPositionUpdate() { CryingChild(); }
 

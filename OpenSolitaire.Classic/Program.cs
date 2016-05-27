@@ -10,7 +10,7 @@ namespace OpenSolitaire.Classic {
         /// </summary>
         [STAThread]
         static void Main() {
-            using (var game = new OpenSolitaireGame())
+            using (var game = new OpenSolitaireClassic())
                 game.Run();
         }
     }

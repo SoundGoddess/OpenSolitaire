@@ -23,7 +23,7 @@ namespace MonoGame.Ruge.CardEngine {
         public bool IsDraggable { get; set; } = false;
         public bool IsVisible { get; set; } = true;
 
-        private SpriteBatch _spriteBatch;
+        private readonly SpriteBatch _spriteBatch;
         
         public StackType type {
             get { return stack.type; }
@@ -32,11 +32,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public Stack stack { get; set; }
 
-
-        public Rectangle Border {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); }
-        }
-
+        public Rectangle Border => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
         #region constructor 
 
@@ -56,7 +52,7 @@ namespace MonoGame.Ruge.CardEngine {
 
 
         public bool Contains(Vector2 pointToCheck) {
-            Point mouse = new Point((int)pointToCheck.X, (int)pointToCheck.Y);
+            var mouse = new Point((int)pointToCheck.X, (int)pointToCheck.Y);
             return Border.Contains(mouse);
         }
 

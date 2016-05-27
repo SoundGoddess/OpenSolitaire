@@ -13,6 +13,7 @@ using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
 namespace OpenSolitaire.Classic {
@@ -51,7 +52,7 @@ namespace OpenSolitaire.Classic {
         public new void Clear() {
 
             foreach (Slot slot in slots) {
-                foreach (Card card in slot.stack.cards) _dragonDrop.Remove(card);
+                foreach (Card card in slot.stack.cards) dragonDrop.Remove(card);
                 slot.stack.Clear();
             }
 
@@ -66,8 +67,8 @@ namespace OpenSolitaire.Classic {
             int x = 20;
             int y = 20;
 
-            Slot drawSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x, y));
-            Slot discardSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x * 2 + _slotTex.Width, y));
+            Slot drawSlot = new Slot(slotTex, cardBack, spriteBatch, new Vector2(x, y));
+            Slot discardSlot = new Slot(slotTex, cardBack, spriteBatch, new Vector2(x * 2 + slotTex.Width, y));
 
             drawSlot.stack = drawPile;
             discardSlot.stack = discardPile;
@@ -82,13 +83,13 @@ namespace OpenSolitaire.Classic {
             _drawSlot = drawSlot;
             _discardSlot = discardSlot;
 
-            y += _slotTex.Height + y;
+            y += slotTex.Height + y;
 
 
             // set up second row of slots
             for (int i = 0; i < 7; i++) {
 
-                Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
+                Slot newSlot = new Slot(slotTex, cardBack, spriteBatch, new Vector2(x + x * i + slotTex.Width * i, y));
                 newSlot.type = StackType.stack;
                 newSlot.stack.method = StackMethod.vertical;
                 newSlot.stack.name = "Stack " + i;
@@ -102,7 +103,7 @@ namespace OpenSolitaire.Classic {
             // set up play/score slots
             for (int i = 6; i >= 3; i--) {
 
-                Slot newSlot = new Slot(_slotTex, _cardBack, _spriteBatch, new Vector2(x + x * i + _slotTex.Width * i, y));
+                Slot newSlot = new Slot(slotTex, cardBack, spriteBatch, new Vector2(x + x * i + slotTex.Width * i, y));
                 newSlot.type = StackType.play;
                 AddSlot(newSlot);
 
@@ -121,7 +122,7 @@ namespace OpenSolitaire.Classic {
 
             drawPile.shuffle();
 
-            foreach (Card card in drawPile.cards) {
+            foreach (var card in drawPile.cards) {
                 
                 if (!card.returnToOrigin) { 
                     card.Position = slots[0].Position;
@@ -133,22 +134,23 @@ namespace OpenSolitaire.Classic {
             }
             
             
-            y += _slotTex.Height + y;
+            y += slotTex.Height + y;
             
-            for (int i = 0; i < 7; i++) {
+            for (var i = 0; i < 7; i++) {
                 
-                Vector2 pos = new Vector2(x + x * i + _slotTex.Width * i, y);
-                Card moveCard = drawPile.drawCard();
+                var pos = new Vector2(x + x * i + slotTex.Width * i, y);
+                var moveCard = drawPile.drawCard();
                 moveCard.origin = pos;
                 moveCard.returnToOrigin = true;
                 moveCard.snapSpeed = 6.0f;
                 moveCard.IsDraggable = false;
+                moveCard.MoveStack(slots[i+2].stack);
                 slots[i+2].stack.addCard(moveCard);
 
-                for (int j = 1; j < i + 1; j++) {
+                for (var j = 1; j < i + 1; j++) {
 
                     moveCard = drawPile.drawCard();
-                    moveCard.origin = new Vector2(pos.X, pos.Y + (_stackOffsetVertical * j));
+                    moveCard.origin = new Vector2(pos.X, pos.Y + (stackOffsetVertical * j));
                     moveCard.returnToOrigin = true;
                     moveCard.snapSpeed = 6.0f;
                     moveCard.IsDraggable = false;
@@ -171,10 +173,10 @@ namespace OpenSolitaire.Classic {
 
             if (type == typeof(Card)) {
 
-                Card card1, card2, card, destination;
+                Card card, destination;
                 
-                card1 = (Card)sender;
-                card2 = (Card)e.item;
+                var card1 = (Card)sender;
+                var card2 = (Card)e.item;
 
 
                 Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
@@ -223,18 +225,12 @@ namespace OpenSolitaire.Classic {
             Card card = (Card)sender;
 
             if (card.IsDraggable) {
-                card.IsSelected = true;
                 isAnimating = true;
             }
 
         }
         private void OnCardDeselected(object sender, EventArgs eventArgs) {
 
-            Card card = (Card)sender;
-
-            card.IsSelected = false;
-
-            if (card.Position != card.origin) card.returnToOrigin = true;
 
         }
 
@@ -256,11 +252,11 @@ namespace OpenSolitaire.Classic {
 
                 isAnimating = false;
 
-                foreach (Slot slot in slots) { 
+                foreach (var slot in slots) { 
 
                     slot.Update(gameTime);
 
-                    foreach (Card card in slot.stack.cards) {
+                    foreach (var card in slot.stack.cards) {
                         if (card.returnToOrigin) isAnimating = true;
                         card.Update(gameTime);
                     }
@@ -268,13 +264,13 @@ namespace OpenSolitaire.Classic {
                 }
 
 
-                foreach (Slot slot in slots) {
+                foreach (var slot in slots) {
 
                     if (!isAnimating && (slot.type == StackType.stack)) {
 
                         if (slot.stack.Count > 0) {
 
-                            Card topCard = slot.stack.topCard();
+                            var topCard = slot.stack.topCard();
 
                             if (!topCard.isFaceUp) {
                                 topCard.flipCard();
@@ -293,8 +289,23 @@ namespace OpenSolitaire.Classic {
 
             if (isSetup && !isAnimating) {
 
-                MouseState mouseState = Mouse.GetState();
-                Point point = _dragonDrop.viewport.PointToScreen(mouseState.X, mouseState.Y);
+                foreach (var slot in slots) {
+                    
+                    if (slot.stack.type == StackType.stack) { 
+
+                        var card = slot.stack.topCard();
+
+                        if (card != null) {
+
+                            card.stackIndex = 0;
+                            card.CryingChild();
+
+                        }
+                    }
+                }
+
+                var mouseState = Mouse.GetState();
+                var point = dragonDrop.viewport.PointToScreen(mouseState.X, mouseState.Y);
 
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
@@ -302,11 +313,11 @@ namespace OpenSolitaire.Classic {
 
                         if (drawPile.Count > 0) {
                             
-                            foreach (Card disCard in discardPile.cards) {
+                            foreach (var disCard in discardPile.cards) {
                                 disCard.IsDraggable = false;
                             }
                             
-                            Card card = drawPile.drawCard();
+                            var card = drawPile.drawCard();
                             card.Position = discardSlot.Position;
                             card.flipCard();
                             card.origin = card.Position;
