@@ -4,7 +4,7 @@ OpenSolitaire - [Copyright (c) 2016 HathorsLove.com](http://www.gnu.org/licenses
 MonoGame.Ruge - [Copyright (c) 2016 MetaSmug](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md) (MIT)
 
 ####MonoGame:
-[Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt)
+[Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt) (MS-PL)
 
 
 ###Card PNG Assets:
