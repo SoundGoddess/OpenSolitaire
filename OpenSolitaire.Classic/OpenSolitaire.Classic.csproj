@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,8 @@
     <AssemblyName>OpenSolitaire.Classic</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -41,22 +42,10 @@
     <StartupObject>OpenSolitaire.Classic.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CardEngine\Card.cs" />
-    <Compile Include="CardEngine\Deck.cs" />
-    <Compile Include="CardEngine\Slot.cs" />
-    <Compile Include="CardEngine\Stack.cs" />
-    <Compile Include="CardEngine\Table.cs" />
-    <Compile Include="DragonDrop\DragonDrop.cs" />
-    <Compile Include="DragonDrop\IDragonDropItem.cs" />
     <Compile Include="OpenSolitaireClassic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableClassic.cs" />
-    <Compile Include="ViewportAdapters\BoxingViewportAdapter.cs" />
-    <Compile Include="ViewportAdapters\DefaultViewportAdapter.cs" />
-    <Compile Include="ViewportAdapters\ScalingViewportAdapter.cs" />
-    <Compile Include="ViewportAdapters\ViewportAdapter.cs" />
-    <Compile Include="ViewportAdapters\WindowViewportAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenTK">
@@ -133,7 +122,6 @@
     <Content Include="Content\spades_K.png" />
     <Content Include="Content\spades_Q.png" />
     <Content Include="Spade.ico" />
-    <Content Include="ViewportAdapters\viewports.txt" />
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -142,11 +130,16 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Content\Arial.spritefont" />
     <None Include="LICENSE.md" />
-    <None Include="README.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Ruge\MonoGame.Ruge.csproj">
+      <Project>{653b7788-0e27-4db5-8bad-088deb13d11c}</Project>
+      <Name>MonoGame.Ruge</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

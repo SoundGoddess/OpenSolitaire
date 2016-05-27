@@ -38,13 +38,10 @@ namespace OpenSolitaire.Classic {
             : base(dd, cardback, slot, stackOffsetH, stackOffsetV) {
 
             // create a fresh card deck
-            drawPile = new Deck(cardback, dd.spriteBatch);
+            drawPile = new Deck(cardback, dd.spriteBatch) { type = StackType.deck };
             drawPile.freshDeck();
-            drawPile.type = StackType.deck;
 
-
-            discardPile = new Deck(cardback, dd.spriteBatch);
-            discardPile.type = StackType.discard;
+            discardPile = new Deck(cardback, dd.spriteBatch) { type = StackType.discard };
 
         }
 

@@ -174,9 +174,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Ruge\MonoGame.Ruge.csproj">
+    <ProjectReference Include="..\MonoGame.Ruge\CardEngine.Refactor.csproj">
       <Project>{70d45967-8503-4870-828a-aea26634c393}</Project>
-      <Name>MonoGame.Ruge</Name>
+      <Name>CardEngine.Refactor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

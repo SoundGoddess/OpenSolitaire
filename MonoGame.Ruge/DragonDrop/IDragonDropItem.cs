@@ -25,5 +25,7 @@ namespace MonoGame.Ruge.DragonDrop {
         void OnDeselected();
         bool Contains(Vector2 pointToCheck);
         void OnCollusion(IDragonDropItem item);
+        void Update(GameTime gameTime);
+        void Draw(GameTime gameTime);
     }
 }

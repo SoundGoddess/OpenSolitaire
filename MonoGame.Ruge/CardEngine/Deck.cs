@@ -14,7 +14,8 @@ namespace MonoGame.Ruge.CardEngine {
 
     public class Deck : Stack {
 
-        public Deck(Texture2D cardBack, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) : base(cardBack, spriteBatch, stackOffsetH, stackOffsetV) {
+        public Deck(Texture2D cardBack, Texture2D slotTex, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) 
+            : base(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) {
 
             type = StackType.deck;
 
@@ -47,7 +48,7 @@ namespace MonoGame.Ruge.CardEngine {
 
             cards.Clear();
 
-            Deck subDeck = new Deck(cardBack, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
+            var subDeck = new Deck(cardBack, slot.Texture, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
             subDeck.freshDeck();
             subDeck.shuffle();
 

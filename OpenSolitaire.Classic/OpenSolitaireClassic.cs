@@ -5,6 +5,8 @@
 * Assets licensed seperately (see LICENSE.md)
 */
 
+using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -88,14 +90,21 @@ namespace OpenSolitaire.Classic {
 
 
             // table creates a fresh table.deck
-            table = new TableClassic(dragonDrop, cardBack, cardSlot, 0, 30);
+            table = new TableClassic(dragonDrop, cardBack, cardSlot, 20, 30);
+            
+            // load up the card assets for the new deck
+            foreach (var card in table.drawPile.cards) {
+
+                var location = card.suit.ToString() + card.rank.ToString();
+                card.SetTexture(Content.Load<Texture2D>(location));
+
+            }
 
             table.InitializeTable();
 
             table.SetTable();
 
-            // todo: remove after testing
-            table.isSetup = true;
+            Components.Add(dragonDrop);
 
         }
 
@@ -127,26 +136,21 @@ namespace OpenSolitaire.Classic {
 
                     newGameColor = Color.Aqua;
 
-                    if (mouseState.LeftButton == ButtonState.Pressed &&
-                        prevMouseState.LeftButton == ButtonState.Released) {
-
-                    /*
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
                         table.Clear();
 
 
                         // load up the card assets for the new deck
-                        foreach (Card card in table.drawPile.cards) {
+                        foreach (var card in table.drawPile.cards) {
 
                             var location = card.suit.ToString() + card.rank.ToString();
                             card.SetTexture(Content.Load<Texture2D>(location));
 
-                            dragonDrop.Add(card);
-
                         }
 
                         table.SetTable();
-                        */
+                        
                     }
                 }
 
@@ -159,8 +163,7 @@ namespace OpenSolitaire.Classic {
 
                     debugColor = Color.Aqua;
 
-                    if (mouseState.LeftButton == ButtonState.Pressed &&
-                        prevMouseState.LeftButton == ButtonState.Released) {
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
                      //   foreach (Slot slot in table.slots) slot.stack.debug();
 
@@ -170,6 +173,8 @@ namespace OpenSolitaire.Classic {
             }
 
             prevMouseState = mouseState;
+            
+            table.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -188,37 +193,66 @@ namespace OpenSolitaire.Classic {
 
             // todo: please comment out the line below if you're going to distribute the game
             spriteBatch.Draw(metaSmug, logoRect, Color.White);
-
-
-
+            
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
 
 #if DEBUG
-            /*
-            int x = 20;
-            int y = cardSlot.Height + 23;
 
-            // show the slot number for easier debugging
-            for (int i = 0; i < 7; i++) {
-                Vector2 vect = new Vector2(x + x * i + cardSlot.Width * i, y);
-                vect.X += cardSlot.Width / 2;
-                spriteBatch.DrawString(debugFont, i.ToString(), vect, Color.Black);
+            foreach (var stack in table.stacks) {
+
+                var slot = stack.slot;
+                var textWidth = debugFont.MeasureString(slot.name);
+                var textPos = new Vector2(slot.Position.X + slot.Texture.Width / 2 - textWidth.X / 2, slot.Position.Y - 16);
+
+                spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
+
             }
-
-            y = 5;
-
-            for (int i = 6; i >= 3; i--) {
-                Vector2 vect = new Vector2(x + x * i + cardSlot.Width * i, y);
-                vect.X += cardSlot.Width / 2;
-                spriteBatch.DrawString(debugFont, i.ToString(), vect, Color.Black);
-            }
-            */
 
             spriteBatch.Draw(debug, debugRect, debugColor);
 #endif
 
 
+            table.Draw(gameTime);
+            
+
+            if (table.isSetup) {
+
+                // fix the Z-ordering
+
+                foreach (var item in dragonDrop.Items) {
+
+                    item.Draw(gameTime);
+
+                }
+                /*
+                var type = item.GetType();
+
+                    if (type == typeof(Card)) {
+
+                        var card = (Card)item;
+
+                        if (card.IsSelected) {
+
+                            Console.WriteLine("selected");
+
+                            card.Draw(gameTime);
+
+                            
+                            while (card.Child != null) {
+                                card = card.Child;
+                                card.Draw(gameTime);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+    */
+
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);

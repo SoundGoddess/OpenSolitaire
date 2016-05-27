@@ -148,9 +148,7 @@ namespace OpenSolitaire {
 
                             var location = card.suit.ToString() + card.rank.ToString();
                             card.SetTexture(Content.Load<Texture2D>(location));
-
-                            dragonDrop.Add(card);
-
+                            
                         }
 
                         table.SetTable();
@@ -235,11 +233,6 @@ namespace OpenSolitaire {
 
             if (table.isSetup) {
 
-                foreach (Slot slot in table.slots) {
-
-                    slot.stack.Draw(gameTime);
-
-                }
                 
                 // fix the Z-ordering
                 foreach (var item in dragonDrop.Items) {
