@@ -34,7 +34,7 @@ namespace OpenSolitaire.Classic {
         public Slot drawSlot { get { return _drawSlot; } }
         public Slot discardSlot { get { return _discardSlot; } }
 
-        public CardTable(DragonDrop<IDragonDropItem> dd, Texture2D cardback, Texture2D slot, int stackOffsetH, int stackOffsetV)
+        public CardTable(DragonDropRef<IDragonDropItem> dd, Texture2D cardback, Texture2D slot, int stackOffsetH, int stackOffsetV)
             : base(dd, cardback, slot, stackOffsetH, stackOffsetV) {
 
             // create a fresh card deck

@@ -2,8 +2,6 @@
 © 2016 The Ruge Project (http://ruge.metasmug.com/) 
 
 Licensed under MIT (see License.txt)
-
-Attribution: some code adapted from XNA example by Jakob Krarup (xnafan.net)
  
  */
 
@@ -11,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using MonoGame.Ruge.ViewportAdapters;
 
@@ -19,14 +18,13 @@ namespace MonoGame.Ruge.DragonDrop {
     public class DragonDrop<T> : DrawableGameComponent where T : IDragonDropItem {
 
         MouseState oldMouse, currentMouse;
-        public SpriteBatch spriteBatch;
-        public ViewportAdapter viewport;
 
-        private List<T> _items;
-        private readonly List<T> _selectedItems;
+        public readonly ViewportAdapter viewport;
 
-        public T ItemUnderTheMouseCursor { get; private set; }
-        public bool IsThereAnItemUnderTheMouseCursor { get; private set; }
+        public T selectedItem;
+        public List<T> dragItems;
+        public List<T> mouseItems;
+        
 
         /// <summary>
         /// Constructor. Uses MonoGame.Extended ViewportAdapter
@@ -34,34 +32,28 @@ namespace MonoGame.Ruge.DragonDrop {
         /// <param name="game"></param>
         /// <param name="sb"></param>
         /// <param name="vp"></param>
-        public DragonDrop(Game game, SpriteBatch sb, ViewportAdapter vp) : base(game) {
-            spriteBatch = sb;
+        public DragonDrop(Game game, ViewportAdapter vp) : base(game) {
             viewport = vp;
-            _selectedItems = new List<T>();
-            _items = new List<T>();
+            selectedItem = default(T);
+            dragItems = new List<T>();
+            mouseItems = new List<T>();
         }
 
-        #region Properties
-        public IEnumerable<T> Items {
-            get {
-
-                // since MonoGame renders sprites on top of each other based on the order they are called in the Draw() method, this
-                // little line of code sorts the sprite objects to take into consideration the ZIndex so that things render as expected.
-                _items = _items.OrderBy(z => z.ZIndex).ToList();
-                foreach (var item in _items) { yield return item; }
-
-            }
+        public void Add(T item) {
+            dragItems.Add(item);
         }
-        public IEnumerable<T> SelectedItems { get { foreach (var item in _selectedItems) { yield return item; } } }
+        public void Remove(T item) { dragItems.Remove(item); }
 
-        public int Count { get { return _items.Count; } }
+        public void Clear() {
+            selectedItem = default(T);
+            dragItems.Clear();
+        }
 
+        private bool click => currentMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released;
+        private bool unClick => currentMouse.LeftButton == ButtonState.Released && oldMouse.LeftButton == ButtonState.Pressed;
+        private bool drag => currentMouse.LeftButton == ButtonState.Pressed;
 
-        private bool MouseWasJustPressed => currentMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released;
-
-        private bool MouseWasJustUnpressed => currentMouse.LeftButton == ButtonState.Released && oldMouse.LeftButton == ButtonState.Pressed;
-
-        private Vector2 CurrentMousePosition {
+        private Vector2 CurrentMouse {
             get {
 
                 var point = viewport.PointToScreen(currentMouse.X, currentMouse.Y);
@@ -71,147 +63,101 @@ namespace MonoGame.Ruge.DragonDrop {
             }
         }
 
-        public Vector2 OldMousePosition {
+        public Vector2 OldMouse {
             get {
 
                 var point = viewport.PointToScreen(oldMouse.X, oldMouse.Y);
 
                 return new Vector2(point.X, point.Y);
 
-
             }
         }
 
-        public Vector2 MouseMovementSinceLastUpdate {
-            get { return CurrentMousePosition - OldMousePosition; }
-        }
+        public Vector2 Movement => CurrentMouse - OldMouse;
 
-        #endregion
 
-        #region Methods
+        private T GetCollusionItem() {
+            
+            var items = dragItems.OrderByDescending(z => z.ZIndex).ToList();
+            foreach (var item in items) {
 
-        private void SaveCurrentMouseState() {
-            oldMouse = currentMouse;
-        }
+                if (item.Contains(CurrentMouse) && !Equals(selectedItem, item)) return item;
 
-        public T ItemUnderMouseCursor() {
-            for (int i = _items.Count - 1; i >= 0; i--) {
-                if (_items[i].Contains(CurrentMousePosition) && _items[i].IsDraggable) {
-                    return _items[i];
-                }
             }
             return default(T);
+
         }
 
+        private T GetMouseHoverItem() {
+
+            var items = dragItems.OrderByDescending(z => z.ZIndex).ToList();
+
+            foreach (var item in items) {
+
+                if (item.Contains(CurrentMouse)) return item;
+
+            }
+
+            return default(T);
+
+        }
+        
         public override void Update(GameTime gameTime) {
-            GetCurrentMouseState();
-            HandleMouseInput();
-            SaveCurrentMouseState();
-        }
 
 
-        private void HandleMouseInput() {
-
-            SetAllItemsToIsMouseOverFalse();
-
-            ItemUnderTheMouseCursor = ItemUnderMouseCursor();
+            currentMouse = Mouse.GetState();
 
 
-            if (!Equals(ItemUnderTheMouseCursor, default(T))) {
+            if (selectedItem != null) {
 
-                UpdateItemUnderMouse();
+                if (selectedItem.IsSelected) {
+                        
+                    if (drag) { 
+                        selectedItem.Position += Movement;
+                        selectedItem.Update(gameTime);
+                    }
+                    else if (unClick) {
 
-                if (MouseWasJustUnpressed) {
+                        var collusionItem = GetCollusionItem();
 
-                    _items = _items.OrderBy(z => z.ZIndex).ToList();
-
-                    foreach (T item in _items) {
-
-                        if (!Equals(ItemUnderTheMouseCursor, item)) {
-
-                            //if (item.Contains(CurrentMousePosition) && item.IsDraggable) ItemUnderTheMouseCursor.HandleCollusion(item);
-                            if (item.Contains(CurrentMousePosition)) ItemUnderTheMouseCursor.OnCollusion(item);
-
+                        if (collusionItem != null) {
+                            selectedItem.OnCollusion(collusionItem);
+                            collusionItem.Update(gameTime);
                         }
 
+                        selectedItem.OnDeselected();
+                        selectedItem.Update(gameTime);
+                        
                     }
+                }
+
+            }
 
 
-                }
+            foreach (var item in dragItems) {
+                item.IsMouseOver = false;
+                item.Update(gameTime);
             }
-            else {
-                if (MouseWasJustPressed) {
-                    DeselectAll();
+
+            var hoverItem = GetMouseHoverItem();
+
+            if (hoverItem != null) {
+
+                hoverItem.IsMouseOver = true;
+
+                if (hoverItem.IsDraggable && click) {
+                    selectedItem = hoverItem;
+                    selectedItem.OnSelected();
                 }
+
+                hoverItem.Update(gameTime);
+
             }
+
+
+            oldMouse = currentMouse;
             
-            if (currentMouse.LeftButton != ButtonState.Released) MoveSelectedItemsIfMouseButtonIsPressed();
-            else DeselectAll();
         }
-
-        public T SubItemUnderMouseCursor(T currentItem) {
-
-            _items = _items.OrderBy(z => z.ZIndex).ToList();
-
-            foreach (var item in _items) {
-                if (item.Contains(CurrentMousePosition) && item.IsDraggable) return item;
-            }
-            return default(T);
-        }
-
-        public void DeselectAll() {
-            for (int i = _selectedItems.Count - 1; i >= 0; i--) {
-                DeselectItem(_selectedItems[i]);
-            }
-        }
-
-        private void SetAllItemsToIsMouseOverFalse() {
-            _items.ForEach(item => item.IsMouseOver = false);
-        }
-
-
-        private void MoveSelectedItemsIfMouseButtonIsPressed() {
-            if (currentMouse.LeftButton == ButtonState.Pressed) {
-                foreach (T item in SelectedItems) {
-
-                    if (item.IsDraggable) item.Position += MouseMovementSinceLastUpdate;
-
-                }
-            }
-        }
-
-        private void UpdateItemUnderMouse() {
-            ItemUnderTheMouseCursor.IsMouseOver = true;
-
-            if (MouseWasJustPressed) {
-                if (ItemUnderTheMouseCursor.IsDraggable) SelectItem(ItemUnderTheMouseCursor);
-            }
-        }
-
-
-        private void SelectItem(T itemToSelect) {
-            itemToSelect.OnSelected();
-            if (!_selectedItems.Contains(itemToSelect)) {
-                _selectedItems.Add(itemToSelect);
-            }
-        }
-
-        private void DeselectItem(T itemToDeselect) {
-            itemToDeselect.OnDeselected();
-            _selectedItems.Remove(itemToDeselect);
-        }
-
-        private void GetCurrentMouseState() { currentMouse = Mouse.GetState(); }
-
-
-        public void Add(T item) { _items.Add(item); }
-        public void Remove(T item) { _items.Remove(item); _selectedItems.Remove(item); }
-
-        public void Clear() {
-            _selectedItems.Clear();
-            _items.Clear();
-        }
-        #endregion
 
     }
 }

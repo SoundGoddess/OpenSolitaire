@@ -174,10 +174,9 @@ namespace MonoGame.Ruge.CardEngine {
                 return topCard;
 
             }
-            else { return null; }
-
+            return null;
         }
-        
+
         public void shuffle() {
 
             //wait a few ms to avoid seed collusion

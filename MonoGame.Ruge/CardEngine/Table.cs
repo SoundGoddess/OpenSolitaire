@@ -25,8 +25,8 @@ namespace MonoGame.Ruge.CardEngine {
         
         public List<Stack> stacks = new List<Stack>();
 
-        public Table(DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
-            spriteBatch = dragonDrop.spriteBatch;
+        public Table(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
+            this.spriteBatch = spriteBatch;
             this.dragonDrop = dragonDrop;
             stackOffsetHorizontal = stackOffsetH;
             stackOffsetVertical = stackOffsetV;
@@ -43,7 +43,11 @@ namespace MonoGame.Ruge.CardEngine {
                 type = type
             };
 
+            slot.stack = stack;
+
             stacks.Add(stack);
+
+            dragonDrop.Add(slot);
 
             return stack;
 
@@ -55,6 +59,13 @@ namespace MonoGame.Ruge.CardEngine {
             stacks.Add(stack);
             
         }
+        
+
+ //       public void MoveStack(Card card, Stack newStack) {
+            
+//            newStack.addCard(card);
+
+//        }
 
         /// <summary>
         /// I recommend only using this for debugging purposes, this is not an ideal way to do things
@@ -109,17 +120,26 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void Update(GameTime gameTime) {
             foreach (var stack in stacks) stack.Update(gameTime);
+
+            // fixes the z-ordering stuff
+            var items = dragonDrop.dragItems.OrderBy(z => z.ZIndex).ToList();
+            foreach (var item in items) {
+                var type = item.GetType();
+                if (type == typeof(Card)) item.Update(gameTime);
+            }
         }
 
         public void Draw(GameTime gameTime) {
-
+            
             foreach (var stack in stacks) stack.Draw(gameTime);
-
+            
             // fixes the z-ordering stuff
-            foreach (var item in dragonDrop.Items) {
+            var items = dragonDrop.dragItems.OrderBy(z => z.ZIndex).ToList();
+            foreach (var item in items) {
                 var type = item.GetType();
                 if (type == typeof(Card)) item.Draw(gameTime);
             }
+
         }
 
 

@@ -35,7 +35,7 @@ namespace OpenSolitaire {
         
         CardTable table;
 
-        DragonDrop<IDragonDropItem> dragonDrop;
+        DragonDropRef<IDragonDropItem> dragonDrop;
         
         private MouseState prevMouseState;
         private SpriteFont debugFont;
@@ -87,7 +87,7 @@ namespace OpenSolitaire {
             debug = Content.Load<Texture2D>("debug");
             debugFont = Content.Load<SpriteFont>("Arial");
 
-            dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
+            dragonDrop = new DragonDropRef<IDragonDropItem>(this, spriteBatch, viewport);
 
             // table creates a fresh table.deck
             table = new CardTable(dragonDrop, cardBack, cardSlot, 0, 30);

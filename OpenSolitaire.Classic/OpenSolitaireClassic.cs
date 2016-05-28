@@ -86,11 +86,11 @@ namespace OpenSolitaire.Classic {
             debug = Content.Load<Texture2D>("debug");
             debugFont = Content.Load<SpriteFont>("Arial");
 
-            dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
+            dragonDrop = new DragonDrop<IDragonDropItem>(this, viewport);
 
 
             // table creates a fresh table.deck
-            table = new TableClassic(dragonDrop, cardBack, cardSlot, 20, 30);
+            table = new TableClassic(spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30);
             
             // load up the card assets for the new deck
             foreach (var card in table.drawPile.cards) {
@@ -130,7 +130,7 @@ namespace OpenSolitaire.Classic {
             newGameColor = Color.White;
 
 
-            if (table.isSetup && !table.isAnimating) {
+            if (table.isSetup && !table.isSnapAnimating) {
 
                 if (newGameRect.Contains(point)) {
 
@@ -138,7 +138,7 @@ namespace OpenSolitaire.Classic {
 
                     if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
-                        table.Clear();
+                        table.NewGame();
 
 
                         // load up the card assets for the new deck
@@ -165,7 +165,7 @@ namespace OpenSolitaire.Classic {
 
                     if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
-                     //   foreach (Slot slot in table.slots) slot.stack.debug();
+                        foreach (var stack in table.stacks) stack.debug();
 
                     }
                 }
@@ -216,43 +216,6 @@ namespace OpenSolitaire.Classic {
             table.Draw(gameTime);
             
 
-            if (table.isSetup) {
-
-                // fix the Z-ordering
-
-                foreach (var item in dragonDrop.Items) {
-
-                    item.Draw(gameTime);
-
-                }
-                /*
-                var type = item.GetType();
-
-                    if (type == typeof(Card)) {
-
-                        var card = (Card)item;
-
-                        if (card.IsSelected) {
-
-                            Console.WriteLine("selected");
-
-                            card.Draw(gameTime);
-
-                            
-                            while (card.Child != null) {
-                                card = card.Child;
-                                card.Draw(gameTime);
-                            }
-
-                        }
-
-                    }
-
-                }
-
-    */
-
-            }
             spriteBatch.End();
 
             base.Draw(gameTime);

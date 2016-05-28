@@ -58,6 +58,8 @@
     <Compile Include="CardEngine\Stack.cs" />
     <Compile Include="CardEngine\Table.cs" />
     <Compile Include="DragonDrop\DragonDrop.cs" />
+    <Compile Include="DragonDrop\DragonDropNew.cs" />
+    <Compile Include="DragonDrop\DragonDropReference.cs" />
     <Compile Include="DragonDrop\IDragonDropItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sprites\SpriteAnimator.cs" />

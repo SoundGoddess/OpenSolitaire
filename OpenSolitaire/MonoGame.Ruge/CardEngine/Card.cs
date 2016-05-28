@@ -76,7 +76,6 @@ namespace MonoGame.Ruge.CardEngine {
         public Vector2 origin { get; set; }
         public float snapSpeed { get; set; } = 25.0f;
         public bool returnToOrigin { get; set; } = false;
-        protected const int ON_TOP = 1000;
         
         public Stack stack { get; set; }
         public int stackIndex { get; set; } = 0;

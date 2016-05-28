@@ -16,7 +16,7 @@ using MonoGame.Ruge.ViewportAdapters;
 
 namespace MonoGame.Ruge.DragonDrop {
 
-    public class DragonDropReference<T> : DrawableGameComponent where T : IDragonDropItem {
+    public class DragonDropRef<T> : DrawableGameComponent where T : IDragonDropItem {
 
         MouseState oldMouse, currentMouse;
         public SpriteBatch spriteBatch;
@@ -34,7 +34,7 @@ namespace MonoGame.Ruge.DragonDrop {
         /// <param name="game"></param>
         /// <param name="sb"></param>
         /// <param name="vp"></param>
-        public DragonDropReference(Game game, SpriteBatch sb, ViewportAdapter vp) : base(game) {
+        public DragonDropRef(Game game, SpriteBatch sb, ViewportAdapter vp) : base(game) {
             spriteBatch = sb;
             viewport = vp;
             _selectedItems = new List<T>();
@@ -52,7 +52,7 @@ namespace MonoGame.Ruge.DragonDrop {
 
             }
         }
-        public IEnumerable<T> SelectedItems { get { return _selectedItems; } }
+        public IEnumerable<T> SelectedItems { get { foreach (var item in _selectedItems) { yield return item; } } }
 
         public int Count { get { return _items.Count; } }
 
@@ -82,7 +82,9 @@ namespace MonoGame.Ruge.DragonDrop {
             }
         }
 
-        public Vector2 MouseMovementSinceLastUpdate => CurrentMousePosition - OldMousePosition;
+        public Vector2 MouseMovementSinceLastUpdate {
+            get { return CurrentMousePosition - OldMousePosition; }
+        }
 
         #endregion
 
@@ -93,11 +95,11 @@ namespace MonoGame.Ruge.DragonDrop {
         }
 
         public T ItemUnderMouseCursor() {
-            
-            foreach (var item in Items) {
-                if (item.Contains(CurrentMousePosition) && item.IsDraggable) return item;
+            for (int i = _items.Count - 1; i >= 0; i--) {
+                if (_items[i].Contains(CurrentMousePosition) && _items[i].IsDraggable) {
+                    return _items[i];
+                }
             }
-                
             return default(T);
         }
 
@@ -120,7 +122,9 @@ namespace MonoGame.Ruge.DragonDrop {
                 UpdateItemUnderMouse();
 
                 if (MouseWasJustUnpressed) {
-                    
+
+                    _items = _items.OrderBy(z => z.ZIndex).ToList();
+
                     foreach (T item in _items) {
 
                         if (!Equals(ItemUnderTheMouseCursor, item)) {
@@ -146,8 +150,10 @@ namespace MonoGame.Ruge.DragonDrop {
         }
 
         public T SubItemUnderMouseCursor(T currentItem) {
-            
-            foreach (var item in Items) {
+
+            _items = _items.OrderBy(z => z.ZIndex).ToList();
+
+            foreach (var item in _items) {
                 if (item.Contains(CurrentMousePosition) && item.IsDraggable) return item;
             }
             return default(T);

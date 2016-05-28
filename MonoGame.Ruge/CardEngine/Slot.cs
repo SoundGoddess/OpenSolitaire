@@ -5,6 +5,7 @@ Licensed under MIT (see License.txt)
 
  */
 
+using System;
 using MonoGame.Ruge.DragonDrop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,8 @@ namespace MonoGame.Ruge.CardEngine {
         public bool IsDraggable { get; set; }
         public int ZIndex { get; set; } = -1;
         public Texture2D Texture { get; set; }
+
+        public Stack stack { get; set; }
 
         private readonly SpriteBatch spriteBatch;
 
@@ -53,7 +56,21 @@ namespace MonoGame.Ruge.CardEngine {
 
 
 
-        public void Update(GameTime gameTime) { }
+        private bool lastMouseOver = false;
+
+        public void Update(GameTime gameTime) {
+
+
+            if (lastMouseOver != IsMouseOver) {
+
+                string mouseOver = IsMouseOver ? "enter" : "exit";
+  //              Console.WriteLine("mouse: " + name + "-" + mouseOver);
+
+            }
+        
+            lastMouseOver = IsMouseOver;
+
+        }
 
         public void Draw(GameTime gameTime) {
             spriteBatch.Draw(Texture, Position, Color.White);

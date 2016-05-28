@@ -19,11 +19,11 @@ namespace MonoGame.Ruge.CardEngine {
         protected int stackOffsetHorizontal, stackOffsetVertical;
         protected Texture2D cardBack, slotTex;
         protected SpriteBatch spriteBatch;
-        protected DragonDrop<IDragonDropItem> dragonDrop;
+        protected DragonDropRef<IDragonDropItem> dragonDrop;
         
         public List<Slot> slots = new List<Slot>();
 
-        public Table(DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
+        public Table(DragonDropRef<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
             spriteBatch = dragonDrop.spriteBatch;
             this.dragonDrop = dragonDrop;
             stackOffsetHorizontal = stackOffsetH;
