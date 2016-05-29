@@ -24,7 +24,7 @@ namespace OpenSolitaire.Classic {
         BoxingViewportAdapter viewport;
 
         const int WINDOW_WIDTH = 1035;
-        const int WINDOW_HEIGHT = 600;
+        const int WINDOW_HEIGHT = 666; // this game is the devil, so it feels right ;)
 
         const int CARD_WIDTH = 125;
         const int CARD_HEIGHT = 156;
@@ -189,7 +189,12 @@ namespace OpenSolitaire.Classic {
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
 
-            var logoRect = new Rectangle(10, 540, metaSmug.Width, metaSmug.Height);
+
+            var refreshRect = new Rectangle(35, 50, refreshMe.Width, refreshMe.Height);
+            spriteBatch.Draw(refreshMe, refreshRect, Color.White);
+
+
+            var logoRect = new Rectangle(10, 610, metaSmug.Width, metaSmug.Height);
 
             // todo: please comment out the line below if you're going to distribute the game
             spriteBatch.Draw(metaSmug, logoRect, Color.White);
@@ -215,7 +220,6 @@ namespace OpenSolitaire.Classic {
 
             table.Draw(gameTime);
             
-
             spriteBatch.End();
 
             base.Draw(gameTime);

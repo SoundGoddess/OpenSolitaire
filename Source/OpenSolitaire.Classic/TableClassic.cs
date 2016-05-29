@@ -202,22 +202,20 @@ namespace OpenSolitaire.Classic {
                 var card = (Card)sender;
                 var slot = (Slot)e.item;
 
-                if (card.Child == null) {
+                Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
 
-                    Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
+                if (slot.stack.Count == 0) {
 
-                    if (slot.stack.Count == 0) {
+                    if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null)
+                        card.MoveToEmptyStack(slot.stack);
+                    if (slot.stack.type == StackType.stack && card.rank == Rank._K)
+                        card.MoveToEmptyStack(slot.stack);
 
-                        if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null)
-                            card.MoveToEmptyStack(slot.stack);
-                        if (slot.stack.type == StackType.stack && card.rank == Rank._K)
-                            card.MoveToEmptyStack(slot.stack);
-
-                        Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
-                    }
+                    Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
                 }
+                
 
-            }
+           }
 
         }
 
