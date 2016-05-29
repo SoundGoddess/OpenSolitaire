@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OpenSolitaire")]
-[assembly: AssemblyProduct("OpenSolitaire")]
+[assembly: AssemblyTitle("OpenSolitaire.Classic")]
+[assembly: AssemblyProduct("OpenSolitaire.Classic")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("671fec86-a05e-4c8a-af8e-ac90f9b7bf25")]
+[assembly: Guid("d39a0a77-5316-4b3b-a9bd-9a13531e61ec")]
 
 // Version information for an assembly consists of the following four values:
 //

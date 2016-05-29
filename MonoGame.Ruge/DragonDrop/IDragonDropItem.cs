@@ -15,7 +15,7 @@ namespace MonoGame.Ruge.DragonDrop {
     public interface IDragonDropItem {
         Vector2 Position { get; set; }
         bool IsSelected { get; set; }
-        bool IsMouseOver { set; }
+        bool IsMouseOver { get; set; }
         Rectangle Border { get; }
         bool IsDraggable { get; set; }
         int ZIndex { get; set; }
@@ -25,5 +25,7 @@ namespace MonoGame.Ruge.DragonDrop {
         void OnDeselected();
         bool Contains(Vector2 pointToCheck);
         void OnCollusion(IDragonDropItem item);
+        void Update(GameTime gameTime);
+        void Draw(GameTime gameTime);
     }
 }
