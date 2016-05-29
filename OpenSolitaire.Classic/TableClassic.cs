@@ -174,9 +174,7 @@ namespace OpenSolitaire.Classic {
                 var card2 = (Card)e.item;
                 
                 Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
-
-                // the secret sauce to getting this working ;)
-
+                
                 if (card1.Position != card1.snapPosition) {
                     card = card1;
                     destination = card2;
@@ -204,14 +202,19 @@ namespace OpenSolitaire.Classic {
                 var card = (Card)sender;
                 var slot = (Slot)e.item;
 
- //               Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
+                if (card.Child == null) {
 
-                if (slot.stack.Count == 0) {
+                    Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
 
-                    if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null) card.MoveToEmptyStack(slot.stack);
-                    if (slot.stack.type == StackType.stack && card.rank == Rank._K) card.MoveToEmptyStack(slot.stack);
+                    if (slot.stack.Count == 0) {
 
-                    Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
+                        if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null)
+                            card.MoveToEmptyStack(slot.stack);
+                        if (slot.stack.type == StackType.stack && card.rank == Rank._K)
+                            card.MoveToEmptyStack(slot.stack);
+
+                        Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
+                    }
                 }
 
             }

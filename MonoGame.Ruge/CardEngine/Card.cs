@@ -55,20 +55,15 @@ namespace MonoGame.Ruge.CardEngine {
         public Vector2 Position {
             get { return _position; }
             set {
+                
                 _position = value;
-
-                int newIndex = ZIndex + 1;
-
                 if (Child != null) {
 
-                    Vector2 pos = new Vector2(Position.X + stack.offset.X, Position.Y + stack.offset.Y);
+                    Vector2 pos = new Vector2(_position.X + stack.offset.X, _position.Y + stack.offset.Y);
 
                     Child.Position = pos;
                     Child.snapPosition = pos;
                     Child.ZIndex = ZIndex + 1;
-
-                    Child.ZIndex = newIndex;
-                    newIndex++;
                     
                 }
 
@@ -154,18 +149,15 @@ namespace MonoGame.Ruge.CardEngine {
 
 
             if (IsSelected) {
-                
-                int i = 0;
-
                 if (Child != null) {
 
-                    Child.Position = new Vector2(Position.X + stack.offset.X * i, Position.Y + stack.offset.Y * i);
-                    Child.ZIndex += ON_TOP;
-                    
+                    var fixChildren = Child;
+
+                    while (fixChildren != null) {
+                        fixChildren.ZIndex += ON_TOP;
+                        fixChildren = fixChildren.Child;
+                    }
                 }
-
-//                if (Position == snapPosition && ZIndex > ON_TOP) ZIndex -= ON_TOP;
-
             }
             
             if (isSnapAnimating) {
@@ -196,26 +188,25 @@ namespace MonoGame.Ruge.CardEngine {
 
 
         public void SetParent(Card parent) {
-
-            foreach (var oldParent in stack.cards) {
- //               if (oldParent.Child == this) oldParent.Child = null;
-            }
             
             stack.cards.Remove(this);
             parent.Child = this;
             parent.stack.addCard(this);
 
             int i = ZIndex;
-            
 
-            if (Child != null) {
+            var fixChildren = Child;
 
+            while (fixChildren != null) {
+                
                 i++;
 
                 Child.stack.cards.Remove(Child);
                 Child.ZIndex = i;
                 stack.addCard(Child);
-                
+
+                fixChildren = fixChildren.Child;
+
             }
 
             parent.stack.UpdatePositions();
