@@ -13,6 +13,7 @@ Copyright (c) 2016 MetaSmug, all rights reserved.  If you're not submitting Pull
 
 ####Card PNG Assets:
 Public Domain ([OpenGameArt.org](http://opengameart.org/content/playing-cards-vector-png))
+
 CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))
 
 ###Audio and Music: 
