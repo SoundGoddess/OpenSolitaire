@@ -5,7 +5,7 @@ Classic Solitaire for Windows, Mac, and Linux
 
 ##Changelog
 
-**5/29/2016 -** Released Beta 1.  The game mostly works now, but there are some bugs to still squash and I want to add an undo feature before bringing it to release stage.
+**5/29/2016 -** Released Alpha 2.  The game mostly works now, but there are some bugs to still squash and I want to add an undo feature before bringing it to release stage.
 
 **5/25/2016 -** Released Alpha 1.  The game is stable and playable, but there are a couple GUI glitches that make it buggy.
 
