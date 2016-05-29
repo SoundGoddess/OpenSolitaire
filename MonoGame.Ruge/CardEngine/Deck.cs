@@ -6,19 +6,16 @@ Licensed under MIT (see License.txt)
  */
 
 using System;
-using System.Threading;
+using MonoGame.Ruge.DragonDrop;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Ruge.CardEngine {
 
     public class Deck : Stack {
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        /// <param name="cardBack"></param>
-        /// <param name="sb"></param>
-        public Deck(Texture2D cardBack, SpriteBatch sb) : base(cardBack, sb) {
+        public Deck(Texture2D cardBack, Texture2D slotTex, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) 
+            : base(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) {
 
             type = StackType.deck;
 
@@ -29,13 +26,13 @@ namespace MonoGame.Ruge.CardEngine {
         /// </summary>
         public void freshDeck() {
 
-            _cards.Clear();
+            cards.Clear();
 
             foreach (Suit mySuit in Enum.GetValues(typeof(Suit))) {
 
                 foreach (Rank myRank in Enum.GetValues(typeof(Rank))) {
 
-                    _cards.Add(new Card(myRank, mySuit, _cardBack, _spriteBatch));
+                    cards.Add(new Card(myRank, mySuit, cardBack, spriteBatch));
 
                 }
 
@@ -49,16 +46,16 @@ namespace MonoGame.Ruge.CardEngine {
         /// <param name="numCards"></param>
         public void testDeck(int numCards) {
 
-            _cards.Clear();
+            cards.Clear();
 
-            Deck subDeck = new Deck(_cardBack, _spriteBatch);
+            var subDeck = new Deck(cardBack, slot.Texture, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
             subDeck.freshDeck();
             subDeck.shuffle();
 
             if (numCards <= subDeck.Count) {
 
                 for (int i = 0; i < numCards; i++) {
-                    _cards.Add(subDeck.drawCard());
+                    cards.Add(subDeck.drawCard());
                 }
 
             }
@@ -66,9 +63,7 @@ namespace MonoGame.Ruge.CardEngine {
             subDeck = null;
 
         }
-        
 
 
     }
-
 }

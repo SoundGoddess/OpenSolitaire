@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenSolitaire {
+namespace OpenSolitaire.Classic {
     /// <summary>
     /// The main class.
     /// </summary>
@@ -10,7 +10,7 @@ namespace OpenSolitaire {
         /// </summary>
         [STAThread]
         static void Main() {
-            using (var game = new OpenSolitaireGame())
+            using (var game = new OpenSolitaireClassic())
                 game.Run();
         }
     }

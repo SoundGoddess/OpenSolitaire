@@ -1,59 +1,59 @@
 ﻿/* ©2016 Hathor Gaia 
- * http://HathorsLove.com
- * 
- * Licensed Under GNU GPL 3:
- * http://www.gnu.org/licenses/gpl-3.0.html
- */
- 
+* http://HathorsLove.com
+* 
+* Source code licensed under GPL-3
+* Assets licensed seperately (see LICENSE.md)
+*/
+
+using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Ruge.ViewportAdapters;
-using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
+using MonoGame.Ruge.CardEngine;
 
-namespace OpenSolitaire {
+namespace OpenSolitaire.Classic {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class OpenSolitaireGame : Game {
-
-        GraphicsDeviceManager graphics;
+    public class OpenSolitaireClassic : Game {
         SpriteBatch spriteBatch;
 
         BoxingViewportAdapter viewport;
 
-        const int WindowWidth = 1035;
-        const int WindowHeight = 600;
+        const int WINDOW_WIDTH = 1035;
+        const int WINDOW_HEIGHT = 600;
 
-        const int spacer = 10;
-        const int cardWidth = 125;
-        const int cardHeight = 156;
-        
-        Texture2D cardSlot, cardBack, refreshMe, newGame;
-        Rectangle newGameRect;
-        Color newGameColor;
-        
-        CardTable table;
+        const int CARD_WIDTH = 125;
+        const int CARD_HEIGHT = 156;
+
+        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug;
+        Rectangle newGameRect, debugRect;
+        Color newGameColor, debugColor;
+
+        private TableClassic table;
 
         DragonDrop<IDragonDropItem> dragonDrop;
-        
+
         private MouseState prevMouseState;
+        private SpriteFont debugFont;
 
-        public OpenSolitaireGame() {
 
-            graphics = new GraphicsDeviceManager(this);
+        public OpenSolitaireClassic() {
+            var graphics = new GraphicsDeviceManager(this);
+
             Content.RootDirectory = "Content";
 
             // set the screen resolution
-            graphics.PreferredBackBufferWidth = WindowWidth;
-            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
+            graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
 
             this.Window.Title = "Open Solitaire Classic";
             this.Window.AllowUserResizing = true;
 
             IsMouseVisible = true;
-
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace OpenSolitaire {
         /// </summary>
         protected override void Initialize() {
 
-            viewport = new BoxingViewportAdapter(Window, GraphicsDevice, WindowWidth, WindowHeight);
+            viewport = new BoxingViewportAdapter(Window, GraphicsDevice, WINDOW_WIDTH, WINDOW_HEIGHT);
 
             base.Initialize();
         }
@@ -74,33 +74,36 @@ namespace OpenSolitaire {
         /// all of your content.
         /// </summary>
         protected override void LoadContent() {
+            
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            
+
             cardSlot = Content.Load<Texture2D>("card_slot");
             cardBack = Content.Load<Texture2D>("card_back_green");
             refreshMe = Content.Load<Texture2D>("refresh");
             newGame = Content.Load<Texture2D>("new_game");
+            metaSmug = Content.Load<Texture2D>("smug-logo");
+            debug = Content.Load<Texture2D>("debug");
+            debugFont = Content.Load<SpriteFont>("Arial");
 
-            dragonDrop = new DragonDrop<IDragonDropItem>(this, spriteBatch, viewport);
+            dragonDrop = new DragonDrop<IDragonDropItem>(this, viewport);
+
 
             // table creates a fresh table.deck
-            table = new CardTable(dragonDrop, cardBack, cardSlot, 0, 30);
-
-            table.InitializeTable();
-
+            table = new TableClassic(spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30);
+            
             // load up the card assets for the new deck
-            foreach (Card card in table.drawPile.cards) {
+            foreach (var card in table.drawPile.cards) {
 
-                string location = card.suit.ToString() + card.rank.ToString();
+                var location = card.suit.ToString() + card.rank.ToString();
                 card.SetTexture(Content.Load<Texture2D>(location));
-
-                dragonDrop.Add(card);
 
             }
 
+            table.InitializeTable();
+
             table.SetTable();
-            
+
             Components.Add(dragonDrop);
 
         }
@@ -109,9 +112,7 @@ namespace OpenSolitaire {
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
         /// </summary>
-        protected override void UnloadContent() {
-            // TODO: Unload any non ContentManager content here
-        }
+        protected override void UnloadContent() { }
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -122,15 +123,14 @@ namespace OpenSolitaire {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            var mouseState = Mouse.GetState();
+            var point = viewport.PointToScreen(mouseState.X, mouseState.Y);
 
-            MouseState mouseState = Mouse.GetState();
-            Point point = viewport.PointToScreen(mouseState.X, mouseState.Y);
+            newGameRect = new Rectangle(310, 20, newGame.Width, newGame.Height);
+            newGameColor = Color.White;
 
-            if (table.isSetup && !table.isAnimating) { 
 
-                newGameRect = new Rectangle(310, 20, newGame.Width, newGame.Height);
-                newGameColor = Color.White;
-
+            if (table.isSetup && !table.isSnapAnimating) {
 
                 if (newGameRect.Contains(point)) {
 
@@ -138,30 +138,44 @@ namespace OpenSolitaire {
 
                     if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
 
-                        table.Clear();
+                        table.NewGame();
 
 
                         // load up the card assets for the new deck
-                        foreach (Card card in table.drawPile.cards) {
+                        foreach (var card in table.drawPile.cards) {
 
-                            string location = card.suit.ToString() + card.rank.ToString();
+                            var location = card.suit.ToString() + card.rank.ToString();
                             card.SetTexture(Content.Load<Texture2D>(location));
-
-                            dragonDrop.Add(card);
 
                         }
 
                         table.SetTable();
-
+                        
                     }
                 }
 
+#if DEBUG
+                debugRect = new Rectangle(310, 80, newGame.Width, newGame.Height);
+                debugColor = Color.White;
+
+
+                if (debugRect.Contains(point)) {
+
+                    debugColor = Color.Aqua;
+
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+
+                        foreach (var stack in table.stacks) stack.debug();
+
+                    }
+                }
+#endif
             }
 
             prevMouseState = mouseState;
-
-
+            
             table.Update(gameTime);
+
             base.Update(gameTime);
         }
 
@@ -174,54 +188,34 @@ namespace OpenSolitaire {
             GraphicsDevice.Clear(Color.SandyBrown);
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
-            
-            foreach (Slot slot in table.slots) slot.Draw(gameTime);
-            
-            //all this does is figure out where to center the refresh icon in relation to the draw slot
-            Rectangle refreshRect = new Rectangle((int)table.slots[0].Position.X + cardWidth / 2 - refreshMe.Width / 2,
-                (int)table.slots[0].Position.Y + cardHeight / 2 - refreshMe.Height / 2, refreshMe.Width, refreshMe.Height);
 
-            spriteBatch.Draw(refreshMe, refreshRect, Color.White);
+            var logoRect = new Rectangle(10, 540, metaSmug.Width, metaSmug.Height);
 
+            // todo: please comment out the line below if you're going to distribute the game
+            spriteBatch.Draw(metaSmug, logoRect, Color.White);
+            
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
-            if (table.isSetup) {
 
-                foreach (Slot slot in table.slots) {
+#if DEBUG
 
-                    foreach (Card card in slot.stack.cards_Zsort) card.Draw(gameTime);
+            foreach (var stack in table.stacks) {
 
-                }
+                var slot = stack.slot;
+                var textWidth = debugFont.MeasureString(slot.name);
+                var textPos = new Vector2(slot.Position.X + slot.Texture.Width / 2 - textWidth.X / 2, slot.Position.Y - 16);
 
+                spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
 
-                foreach (Card card in table.drawPile.cards_Zsort) card.Draw(gameTime);
-                foreach (Card card in table.discardPile.cards_Zsort) card.Draw(gameTime);
-
-
-                // fix the Z-ordering
-                foreach (var item in dragonDrop.Items) {
-
-                    var type = item.GetType();
-
-                    if (type == typeof(Card)) {
-
-                        Card card = (Card)item;
-
-                        if (card.IsSelected || card.returnToOrigin) {
-
-                            card.Draw(gameTime);
-
-                            while (card.Child != null) {
-                                card = card.Child;
-                                card.Draw(gameTime);
-                            }
-
-                        }
-
-                    }
-
-                }
             }
+
+            spriteBatch.Draw(debug, debugRect, debugColor);
+#endif
+
+
+            table.Draw(gameTime);
+            
+
             spriteBatch.End();
 
             base.Draw(gameTime);

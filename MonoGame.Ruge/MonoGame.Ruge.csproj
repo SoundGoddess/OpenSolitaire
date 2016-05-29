@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70D45967-8503-4870-828A-AEA26634C393}</ProjectGuid>
+    <ProjectGuid>{653B7788-0E27-4DB5-8BAD-088DEB13D11C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MonoGame.Ruge</RootNamespace>
