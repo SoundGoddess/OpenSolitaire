@@ -1,11 +1,11 @@
 # Open Solitaire Classic
-Classic Solitaire for Windows, Mac, and Linux
+Classic Solitaire Game for Windows, Mac, and Linux
 
 ##[Downloads](https://github.com/SoundGoddess/OpenSolitaire/releases)
 
 ##Changelog
 
-**5/29/2016 -** Finally got a working, bug-free build but somehow my git repo got all screwed up and my source code ended up merging weird and I try to roll back but the code I rolled back to still has the bugs so I'm a bit frustrated, going to have to look at this more tomorrow.
+**5/30/2016 -** Finally got a working, bug-free build :D
 
 **5/28/2016 -** Released Alpha 2.  The game mostly works now, but there are some bugs to still squash and I want to add an undo feature before bringing it to release stage.
 
