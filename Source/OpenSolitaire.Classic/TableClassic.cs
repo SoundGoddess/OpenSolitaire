@@ -191,7 +191,7 @@ namespace OpenSolitaire.Classic {
 
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + destination.suit + destination.rank);
 
-                    if (destination.stack.type == StackType.play && card.color == destination.color) card.SetParent(destination);
+                    if (destination.stack.type == StackType.play && card.suit == destination.suit) card.SetParent(destination);
                     else if (destination.stack.type == StackType.stack && card.color != destination.color && 
                         card.rank == destination.rank - 1) card.SetParent(destination);
 

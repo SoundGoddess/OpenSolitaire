@@ -19,6 +19,10 @@ namespace OpenSolitaire.Classic {
     /// This is the main type for your game.
     /// </summary>
     public class OpenSolitaireClassic : Game {
+
+        private const string version = "v 0.9.1";
+
+
         SpriteBatch spriteBatch;
 
         BoxingViewportAdapter viewport;
@@ -50,7 +54,7 @@ namespace OpenSolitaire.Classic {
             graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
             graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
 
-            this.Window.Title = "???Open Solitaire Classic - hosed repo :(:(:(";
+            this.Window.Title = "Open Solitaire Classic";
             this.Window.AllowUserResizing = true;
 
             IsMouseVisible = true;
@@ -189,10 +193,10 @@ namespace OpenSolitaire.Classic {
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
 
-            var logoRect = new Rectangle(10, 620, metaSmug.Width, metaSmug.Height);
+            var logoVect = new Vector2(10, WINDOW_HEIGHT - metaSmug.Height - 10);
 
             // todo: please comment out the line below if you're going to distribute the game
-            spriteBatch.Draw(metaSmug, logoRect, Color.White);
+            spriteBatch.Draw(metaSmug, logoVect, Color.White);
             
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
@@ -212,11 +216,17 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(debug, debugRect, debugColor);
 #endif
 
-            spriteBatch.DrawString(debugFont, "repo hosed", new Vector2(666,640), Color.Black);
-            spriteBatch.DrawString(debugFont, "v 0.9", new Vector2(998,640), Color.Black);
+            var versionSize = debugFont.MeasureString(version);
+            var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
+            spriteBatch.DrawString(debugFont, version, versionPos, Color.Black);
 
             table.Draw(gameTime);
             
+            if (table.drawPile.Count == 0) spriteBatch.Draw(refreshMe, new Vector2(35,50), debugColor);
+
+            var items = dragonDrop.dragItems.OrderBy(z => z.ZIndex).ToList();
+
+            foreach (var item in items) if (item.ZIndex > 1000) item.Draw(gameTime);
 
             spriteBatch.End();
 
