@@ -160,7 +160,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Content\Arial.spritefont" />
-    <None Include="LICENSE.md" />
+    <None Include="LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Ruge\MonoGame.Ruge.csproj">
