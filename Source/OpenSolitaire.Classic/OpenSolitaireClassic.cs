@@ -20,7 +20,7 @@ namespace OpenSolitaire.Classic {
     /// </summary>
     public class OpenSolitaireClassic : Game {
 
-        private const string version = "v 0.9.1";
+        private const string VERSION = "v 0.9.2";
 
 
         SpriteBatch spriteBatch;
@@ -216,18 +216,15 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(debug, debugRect, debugColor);
 #endif
 
-            var versionSize = debugFont.MeasureString(version);
+            var versionSize = debugFont.MeasureString(VERSION);
             var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
-            spriteBatch.DrawString(debugFont, version, versionPos, Color.Black);
+            spriteBatch.DrawString(debugFont, VERSION, versionPos, Color.Black);
+
+            spriteBatch.Draw(refreshMe, new Vector2(35,50), debugColor);
 
             table.Draw(gameTime);
             
-            if (table.drawPile.Count == 0) spriteBatch.Draw(refreshMe, new Vector2(35,50), debugColor);
-
-            var items = dragonDrop.dragItems.OrderBy(z => z.ZIndex).ToList();
-
-            foreach (var item in items) if (item.ZIndex > 1000) item.Draw(gameTime);
-
+            
             spriteBatch.End();
 
             base.Draw(gameTime);
