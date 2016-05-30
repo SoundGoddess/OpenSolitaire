@@ -201,6 +201,14 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
 
+            spriteBatch.Draw(refreshMe, new Vector2(35, 50), Color.White);
+
+
+            var versionSize = debugFont.MeasureString(VERSION);
+            var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
+            spriteBatch.DrawString(debugFont, VERSION, versionPos, Color.Black);
+
+
 #if DEBUG
 
             foreach (var stack in table.stacks) {
@@ -216,11 +224,7 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(debug, debugRect, debugColor);
 #endif
 
-            var versionSize = debugFont.MeasureString(VERSION);
-            var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
-            spriteBatch.DrawString(debugFont, VERSION, versionPos, Color.Black);
 
-            spriteBatch.Draw(refreshMe, new Vector2(35,50), debugColor);
 
             table.Draw(gameTime);
             
