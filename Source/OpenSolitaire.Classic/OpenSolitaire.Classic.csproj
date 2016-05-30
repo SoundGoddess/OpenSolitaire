@@ -89,6 +89,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="changelog.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\card_back_green.png" />
     <Content Include="Content\card_back_purple.png" />
     <Content Include="Content\card_slot.png" />
@@ -149,7 +152,9 @@
     <Content Include="Content\spades_J.png" />
     <Content Include="Content\spades_K.png" />
     <Content Include="Content\spades_Q.png" />
-    <Content Include="Spade.ico" />
+    <Content Include="Spade.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,5 +1,5 @@
-###EULA
-If something breaks, you agree not to sue me.  
+###EULA (IANAL)
+If something breaks, you agree not to sue me. 
 
 ###Source Code: 
 OpenSolitaire.Classic - [Copyright (c) 2016 HathorsLove.com (GPL-3)](http://www.gnu.org/licenses/gpl-3.0.html)

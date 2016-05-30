@@ -1,8 +1,10 @@
-﻿v0.9.2 
-	- something glitched with the repo and the refresh icon disappeared. added it back in.
+﻿Release Notes
+
+v0.9.2 
+- something glitched with the repo and the refresh icon disappeared. added it back in.
 
 v0.9.1
-	- fixed bug where play stacks were allowing plays on same color instead of suit.
+- fixed bug where play stacks were allowing plays on same color instead of suit.
 
 v0.9 
-	- finally fixed all the glitches from Alpha 2.
+- finally fixed all the glitches from Alpha 2.
