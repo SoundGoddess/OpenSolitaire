@@ -24,7 +24,7 @@ namespace OpenSolitaire.Classic {
         BoxingViewportAdapter viewport;
 
         const int WINDOW_WIDTH = 1035;
-        const int WINDOW_HEIGHT = 666; // this game is the devil, so it feels right ;)
+        const int WINDOW_HEIGHT = 666;
 
         const int CARD_WIDTH = 125;
         const int CARD_HEIGHT = 156;
@@ -50,7 +50,7 @@ namespace OpenSolitaire.Classic {
             graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
             graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
 
-            this.Window.Title = "Open Solitaire Classic";
+            this.Window.Title = "???Open Solitaire Classic - hosed repo :(:(:(";
             this.Window.AllowUserResizing = true;
 
             IsMouseVisible = true;
@@ -189,12 +189,7 @@ namespace OpenSolitaire.Classic {
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
 
-
-            var refreshRect = new Rectangle(35, 50, refreshMe.Width, refreshMe.Height);
-            spriteBatch.Draw(refreshMe, refreshRect, Color.White);
-
-
-            var logoRect = new Rectangle(10, 610, metaSmug.Width, metaSmug.Height);
+            var logoRect = new Rectangle(10, 620, metaSmug.Width, metaSmug.Height);
 
             // todo: please comment out the line below if you're going to distribute the game
             spriteBatch.Draw(metaSmug, logoRect, Color.White);
@@ -217,9 +212,12 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(debug, debugRect, debugColor);
 #endif
 
+            spriteBatch.DrawString(debugFont, "repo hosed", new Vector2(666,640), Color.Black);
+            spriteBatch.DrawString(debugFont, "v 0.9", new Vector2(998,640), Color.Black);
 
             table.Draw(gameTime);
             
+
             spriteBatch.End();
 
             base.Draw(gameTime);

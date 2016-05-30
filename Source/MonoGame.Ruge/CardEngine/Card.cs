@@ -57,8 +57,9 @@ namespace MonoGame.Ruge.CardEngine {
             set {
                 
                 _position = value;
+                
                 if (Child != null) {
-
+                    
                     Vector2 pos = new Vector2(_position.X + stack.offset.X, _position.Y + stack.offset.Y);
 
                     Child.Position = pos;
@@ -129,34 +130,17 @@ namespace MonoGame.Ruge.CardEngine {
         #endregion
 
         #region MonoGame
-
-        private bool lastMouseOver = false;
-
+        
 
         public void Update(GameTime gameTime) {
-
-            if (isFaceUp) {
-
-                if (lastMouseOver != IsMouseOver) {
-                    
-                    string mouseOver = IsMouseOver ? "enter" : "exit";
-                 //   Console.WriteLine("mouse: " + suit + "-" + rank + " - " + mouseOver);
-
-                }
-            }
             
-            lastMouseOver = IsMouseOver;
-
 
             if (IsSelected) {
-                if (Child != null) {
+                var fixChild = Child;
 
-                    var fixChildren = Child;
-
-                    while (fixChildren != null) {
-                        fixChildren.ZIndex += ON_TOP;
-                        fixChildren = fixChildren.Child;
-                    }
+                while (fixChild != null) {
+                    fixChild.ZIndex += ON_TOP;
+                    fixChild = fixChild.Child;
                 }
             }
             
@@ -176,12 +160,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void MoveToEmptyStack(Stack newStack) {
 
-            if (newStack.Count == 0) {
-
-                stack.cards.Remove(this);
-                newStack.addCard(this, true);
-
-            }
+            if (newStack.Count == 0) newStack.addCard(this, true);
 
         }
 
@@ -189,27 +168,8 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void SetParent(Card parent) {
             
-            stack.cards.Remove(this);
             parent.Child = this;
-            parent.stack.addCard(this);
-
-            int i = ZIndex;
-
-            var fixChildren = Child;
-
-            while (fixChildren != null) {
-                
-                i++;
-
-                Child.stack.cards.Remove(Child);
-                Child.ZIndex = i;
-                stack.addCard(Child);
-
-                fixChildren = fixChildren.Child;
-
-            }
-
-            parent.stack.UpdatePositions();
+            parent.stack.addCard(this, true);
 
         }
 
@@ -255,7 +215,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void OnSelected() {
             
-            Console.WriteLine("mouse: " + suit + "-" + rank + " - selected");
+//            Console.WriteLine("mouse: " + suit + "-" + rank + " - selected");
 
             if (IsDraggable) {
                 IsSelected = true;
@@ -269,7 +229,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void OnDeselected() {
 
-            Console.WriteLine("mouse: " + suit + "-" + rank + " - deselected");
+//            Console.WriteLine("mouse: " + suit + "-" + rank + " - deselected");
 
             IsSelected = false;
 

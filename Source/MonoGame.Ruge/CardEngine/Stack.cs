@@ -8,7 +8,9 @@ Licensed under MIT (see License.txt)
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using MonoGame.Ruge.DragonDrop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -95,13 +97,72 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
 
+        private void NukeParents(Card nukeMe) {
+
+            foreach (var card in cards)
+                if (card.Child == nukeMe) card.Child = null;
+
+        }
+
+
         public void addCard(Card card, bool update = false) {
+            
+            if (card.stack != null) { 
+                card.stack.cards.Remove(card);
+                card.stack.NukeParents(card);
+            }
             card.stack = this;
             cards.Add(card);
             card.ZIndex = Count + 1;
+            
+            var fixChild = card.Child;
+
+            while (fixChild != null) {
+
+                if (fixChild.stack != null) {
+                    fixChild.stack.cards.Remove(fixChild);
+                    fixChild.stack.NukeParents(fixChild);
+                }
+                
+                fixChild.stack = this;
+
+                cards.Add(fixChild);
+
+                fixChild = fixChild.Child;
+
+            }
+
+
+            int i = 0;
+
+            foreach (var fixIndex in cards) fixIndex.ZIndex = i++;
+            
             if (update) UpdatePositions();
         }
+
         
+        public void UpdatePositions(StackMethod stackMethod = StackMethod.undefined) {
+
+            // only override the stack method if a new one is passed in explicitly.
+            if (stackMethod != StackMethod.undefined) method = stackMethod;
+
+            cards = cards.OrderBy(z => z.ZIndex).ToList();
+
+            int i = 0;
+
+            foreach (var card in cards) {
+
+                card.Position = new Vector2(slot.Position.X + offset.X * i, slot.Position.Y + offset.Y * i);
+                card.snapPosition = card.Position;
+                
+                i++;
+
+            }
+
+        }
+
+
+
         /// <summary>
         /// just picks the top card on the stack and returns it
         /// </summary>
@@ -119,28 +180,13 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
 
-        public void UpdatePositions(StackMethod stackMethod = StackMethod.undefined) {
-
-            if (stackMethod != StackMethod.undefined) method = stackMethod;
-
-            cards = cards.OrderBy(z => z.ZIndex).ToList();
-
-            int i = 0;
-
-            foreach (var card in cards) {
-
-                card.Position = new Vector2(slot.Position.X + offset.X * i, slot.Position.Y + offset.Y * i);
-                card.snapPosition = card.Position;
-
-                i++;
-
-            }
-
-        }
-
         #region MonoGame
 
         public void Update(GameTime gameTime) {
+
+            //foreach (var card in cards)
+              //  if (card.stack != this) cards.Remove(card);
+
             slot.Update(gameTime);
         }
         
@@ -167,10 +213,11 @@ namespace MonoGame.Ruge.CardEngine {
 
                     strFaceUp = (card.isFaceUp ? "face up" : "face down");
                     Console.Write("z" + card.ZIndex.ToString("00") + ": " + card.rank + " of " + card.suit + " (" + strFaceUp + ")");
+                    Console.Write(" - " + card.stack.name);
                     
                     if (card.Child != null) {
                         strFaceUp = (card.Child.isFaceUp ? "face up" : "face down");
-                        Console.Write(" - z" + card.Child.ZIndex.ToString("00") + ": " +
+                        Console.Write(" -> z" + card.Child.ZIndex.ToString("00") + ": " +
                         card.Child.rank + " of " + card.Child.suit + " (" + strFaceUp + ")");
                     }
                     

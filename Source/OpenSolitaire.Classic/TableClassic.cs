@@ -125,6 +125,7 @@ namespace OpenSolitaire.Classic {
             foreach (var card in drawPile.cards) {
                 card.Selected += OnCardSelected;
                 card.Collusion += OnCollusion;
+                card.stack = drawPile;
             }
 
             int x = 20;
@@ -201,6 +202,7 @@ namespace OpenSolitaire.Classic {
 
                 var card = (Card)sender;
                 var slot = (Slot)e.item;
+                
 
                 Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
 
@@ -213,9 +215,8 @@ namespace OpenSolitaire.Classic {
 
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
                 }
-                
 
-           }
+            }
 
         }
 

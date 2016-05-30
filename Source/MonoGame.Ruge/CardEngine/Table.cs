@@ -54,7 +54,9 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
         public void AddStack(Stack stack) {
-            
+
+            foreach (var card in stack.cards) card.stack = stack;
+
             stack.UpdatePositions();
             stacks.Add(stack);
             
