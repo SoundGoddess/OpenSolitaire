@@ -1,9 +1,9 @@
 ###Source Code: 
-OpenSolitaire - [Copyright (c) 2016 HathorsLove.com](http://www.gnu.org/licenses/gpl-3.0.html) (GPL-3)
+OpenSolitaire (game logic) - [Copyright (c) 2016 HathorsLove.com](http://www.gnu.org/licenses/gpl-3.0.html) (GPL-3)
 
-MonoGame.Ruge - [Copyright (c) 2016 MetaSmug](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md) (MIT)
+MonoGame.Ruge (playing card engine) - [Copyright (c) 2016 MetaSmug](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md) (MIT)
 
-####MonoGame:
+####MonoGame (distribution framework):
 [Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt) (MS-PL)
 
 ###Graphics:
