@@ -3,8 +3,7 @@ OpenSolitaire (game logic) - [Copyright (c) 2016 HathorsLove.com](http://www.gnu
 
 MonoGame.Ruge (playing card engine) - [Copyright (c) 2016 MetaSmug](https://github.com/MetaSmug/RollYourOwnGameEngine/blob/master/LICENSE.md) (MIT)
 
-####MonoGame (distribution framework):
-[Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt) (MS-PL)
+MonoGame (distribution framework) - [Copyright (c) 2016 The MonoGame Team](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt) (MS-PL)
 
 ###Graphics:
 
