@@ -63,6 +63,9 @@ namespace MonoGame.Ruge.CardEngine {
         public Slot slot { get; set; }
         public void Clear() { cards.Clear(); }
 
+        public int crunchItems { get; set; } = 0;
+        public bool crunchStacks = false;
+
 
         public Stack(Texture2D cardBack, Texture2D slotTex, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) {
             slot = new Slot(slotTex,spriteBatch) {stack = this};
@@ -141,20 +144,56 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
         
-        public void UpdatePositions(StackMethod stackMethod = StackMethod.undefined) {
-
-            // only override the stack method if a new one is passed in explicitly.
-            if (stackMethod != StackMethod.undefined) method = stackMethod;
-
-            cards = cards.OrderBy(z => z.ZIndex).ToList();
-
+        public void UpdatePositions() {
+            
             int i = 0;
-
+            int numFaceDown = 0;
+            
+            cards = cards.OrderBy(z => z.ZIndex).ToList();
             foreach (var card in cards) {
 
-                card.Position = new Vector2(slot.Position.X + offset.X * i, slot.Position.Y + offset.Y * i);
+                if (!card.isFaceUp) numFaceDown++;
+
+                var stackOffestX = offset.X;
+                var stackOffestY = offset.Y;
+
+                crunchStacks = false;
+
+                // the stack has a lot of items so crunch
+                if (crunchItems > 0 && cards.Count >= crunchItems) {
+
+                    if (card.isFaceUp) {
+                            
+                        stackOffestX = (stackOffestX > 0) ? stackOffestX - 3 : 0;
+                        stackOffestY = (stackOffestY > 0) ? stackOffestY - 3 : 0;
+                            
+                    }
+                    else {
+                        stackOffestX = stackOffestX / 2;
+                        stackOffestY = stackOffestY / 2;
+                    }
+                    crunchStacks = true;
+                   
+                }
+
+
+                var newCardX = slot.Position.X + stackOffestX * i;
+                var newCardY = slot.Position.Y + stackOffestY * i;
+
+                if (card.isFaceUp && crunchItems > 0 && cards.Count >= crunchItems) {
+                    newCardX -= offset.X * numFaceDown / 2 - offset.X / 2;
+                    newCardY -= offset.Y * numFaceDown / 2 - offset.Y / 2;
+
+                    if (numFaceDown == 0) {
+                        newCardX -= offset.X / 2;
+                        newCardY -= offset.Y / 2;
+                    }
+
+                }
+
+                card.Position = new Vector2(newCardX, newCardY);
                 card.snapPosition = card.Position;
-                
+
                 i++;
 
             }
@@ -183,11 +222,13 @@ namespace MonoGame.Ruge.CardEngine {
         #region MonoGame
 
         public void Update(GameTime gameTime) {
-
-            //foreach (var card in cards)
-              //  if (card.stack != this) cards.Remove(card);
-
             slot.Update(gameTime);
+
+            if (crunchStacks) {
+                foreach (var card in cards) card.Update(gameTime);
+                if (cards.Count < crunchItems) UpdatePositions();
+            }
+
         }
         
         public void Draw(GameTime gameTime) {

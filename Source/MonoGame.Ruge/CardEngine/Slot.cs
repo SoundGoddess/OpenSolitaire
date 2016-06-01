@@ -6,6 +6,7 @@ Licensed under MIT (see License.txt)
  */
 
 using System;
+using System.Collections.Generic;
 using MonoGame.Ruge.DragonDrop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -44,17 +45,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void OnSelected() { }
         public void OnDeselected() {}
-
-        public void OnCollusion(IDragonDropItem item) {
-            
-
-
-
-
-
-        }
-
-
+        public void OnCollusion(IDragonDropItem item) { }
 
         private bool lastMouseOver = false;
 

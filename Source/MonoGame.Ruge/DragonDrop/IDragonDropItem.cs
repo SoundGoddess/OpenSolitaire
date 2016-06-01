@@ -20,7 +20,7 @@ namespace MonoGame.Ruge.DragonDrop {
         bool IsDraggable { get; set; }
         int ZIndex { get; set; }
         Texture2D Texture { get; }
-        
+
         void OnSelected();
         void OnDeselected();
         bool Contains(Vector2 pointToCheck);

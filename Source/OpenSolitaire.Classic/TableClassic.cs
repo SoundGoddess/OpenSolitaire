@@ -105,11 +105,14 @@ namespace OpenSolitaire.Classic {
             // set up second row of slots
             for (int i = 0; i < 7; i++) {
 
+                // add crunch for these stacks
                 var newSlot = new Slot(slotTex, spriteBatch) {
                     Position = new Vector2(x + x*i + slotTex.Width*i, y),
                     name = "Stack " + i
                 };
-                AddStack(newSlot, StackType.stack, StackMethod.vertical);
+                
+                var newStack = AddStack(newSlot, StackType.stack, StackMethod.vertical);
+                newStack.crunchItems = 12;
 
             }
 
@@ -186,9 +189,9 @@ namespace OpenSolitaire.Classic {
 
                 var card1 = (Card)sender;
                 var card2 = (Card)e.item;
-                
+
                 //Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
-                
+
                 if (card1.Position != card1.snapPosition) {
                     card = card1;
                     destination = card2;
@@ -204,16 +207,21 @@ namespace OpenSolitaire.Classic {
 
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + destination.suit + destination.rank);
 
+                    
                     if (destination.stack.type == StackType.play && card.suit == destination.suit &&
                         card.rank == destination.rank + 1) {
-                            card.SetParent(destination);
-                            cardPlaySound.Play();
+                        card.SetParent(destination);
+                        cardPlaySound.Play();
                     }
-                    else if (destination.stack.type == StackType.stack && card.color != destination.color && 
+                    else if (destination.stack.type == StackType.stack && card.color != destination.color &&
                         card.rank == destination.rank - 1) {
-                            card.SetParent(destination);
-                            cardParentSound.Play(.6f, 1f, 1f);
+                        card.SetParent(destination);
+                        cardParentSound.Play(.6f, 1f, 1f);
                     }
+                    
+
+                    // todo: delete after testing
+                    //card.SetParent(destination);
 
                 }
 
@@ -222,7 +230,7 @@ namespace OpenSolitaire.Classic {
 
                 var card = (Card)sender;
                 var slot = (Slot)e.item;
-                
+
 
                 //Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
 

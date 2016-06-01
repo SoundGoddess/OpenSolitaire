@@ -56,7 +56,9 @@
     <Compile Include="CardEngine\Deck.cs" />
     <Compile Include="CardEngine\Slot.cs" />
     <Compile Include="CardEngine\Stack.cs" />
+    <Compile Include="CardEngine\StackCrunch.cs" />
     <Compile Include="CardEngine\Table.cs" />
+    <Compile Include="DragonDrop\CollusionItem.cs" />
     <Compile Include="DragonDrop\DragonDrop.cs" />
     <Compile Include="DragonDrop\IDragonDropItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

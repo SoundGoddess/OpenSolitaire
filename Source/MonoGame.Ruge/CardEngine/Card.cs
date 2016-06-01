@@ -6,6 +6,7 @@ Licensed under MIT (see License.txt)
  */
 
 using System;
+using System.Collections.Generic;
 using MonoGame.Ruge.DragonDrop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -201,6 +202,8 @@ namespace MonoGame.Ruge.CardEngine {
 
                 ZIndex -= ON_TOP;
 
+                if (stack.crunchStacks) stack.UpdatePositions();
+
             }
             else Position = pos;
 
@@ -238,6 +241,7 @@ namespace MonoGame.Ruge.CardEngine {
             Deselected?.Invoke(this, EventArgs.Empty);
 
         }
+
 
         public event EventHandler<CollusionEvent> Collusion;
 

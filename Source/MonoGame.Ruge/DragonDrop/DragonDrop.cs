@@ -1,6 +1,5 @@
 ﻿/* 
 © 2016 The Ruge Project (http://ruge.metasmug.com/) 
-
 Licensed under MIT (see License.txt)
  
  */
@@ -24,7 +23,7 @@ namespace MonoGame.Ruge.DragonDrop {
         public T selectedItem;
         public List<T> dragItems;
         public List<T> mouseItems;
-        
+
 
         /// <summary>
         /// Constructor. Uses MonoGame.Extended ViewportAdapter
@@ -77,11 +76,18 @@ namespace MonoGame.Ruge.DragonDrop {
 
 
         private T GetCollusionItem() {
-            
+
             var items = dragItems.OrderByDescending(z => z.ZIndex).ToList();
             foreach (var item in items) {
 
                 if (item.Contains(CurrentMouse) && !Equals(selectedItem, item)) return item;
+
+            }
+         
+            // if it doesn't contain the current mouse, run again to see if it intersects
+            foreach (var item in items) {
+
+                if (item.Border.Intersects(selectedItem.Border) && !Equals(selectedItem, item)) return item;
 
             }
             return default(T);
@@ -101,7 +107,7 @@ namespace MonoGame.Ruge.DragonDrop {
             return default(T);
 
         }
-        
+
         public override void Update(GameTime gameTime) {
 
 
@@ -111,8 +117,8 @@ namespace MonoGame.Ruge.DragonDrop {
             if (selectedItem != null) {
 
                 if (selectedItem.IsSelected) {
-                        
-                    if (drag) { 
+
+                    if (drag) {
                         selectedItem.Position += Movement;
                         selectedItem.Update(gameTime);
                     }
@@ -127,7 +133,7 @@ namespace MonoGame.Ruge.DragonDrop {
 
                         selectedItem.OnDeselected();
                         selectedItem.Update(gameTime);
-                        
+
                     }
                 }
 
@@ -156,7 +162,7 @@ namespace MonoGame.Ruge.DragonDrop {
 
 
             oldMouse = currentMouse;
-            
+
         }
 
     }

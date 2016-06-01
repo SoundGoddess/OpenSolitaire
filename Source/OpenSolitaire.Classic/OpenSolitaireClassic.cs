@@ -19,7 +19,7 @@ namespace OpenSolitaire.Classic {
     /// </summary>
     public class OpenSolitaireClassic : Game {
 
-        private const string VERSION = "v 0.9.4a";
+        private const string VERSION = "v 0.9.5";
 
         SpriteBatch spriteBatch;
 

@@ -1,5 +1,16 @@
 ﻿Release Notes
 
+v0.9.5
+- made single-card stack drops more forgiving
+- cards now crunch if the pile gets too tall
+
+v0.9.4
+- added sound effects
+- added double-click
+
+v0.9.3
+- fixed logic error where it was letting you play invalid cards
+
 v0.9.2 
 - something glitched with the repo and the refresh icon disappeared. added it back in.
 
