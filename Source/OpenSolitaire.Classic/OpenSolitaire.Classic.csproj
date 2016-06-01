@@ -124,6 +124,7 @@
     <Content Include="Content\diamonds_J.png" />
     <Content Include="Content\diamonds_K.png" />
     <Content Include="Content\diamonds_Q.png" />
+    <Content Include="Content\game-win.wav" />
     <Content Include="Content\hearts_10.png" />
     <Content Include="Content\hearts_2.png" />
     <Content Include="Content\hearts_3.png" />

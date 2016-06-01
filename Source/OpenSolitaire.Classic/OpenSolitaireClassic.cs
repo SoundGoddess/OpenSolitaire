@@ -19,7 +19,7 @@ namespace OpenSolitaire.Classic {
     /// </summary>
     public class OpenSolitaireClassic : Game {
 
-        private const string VERSION = "v 0.9.3";
+        private const string VERSION = "v 0.9.4a";
 
         SpriteBatch spriteBatch;
 
@@ -94,7 +94,8 @@ namespace OpenSolitaire.Classic {
                 Content.Load<SoundEffect>("table-animation"),
                 Content.Load<SoundEffect>("card-parent"),
                 Content.Load<SoundEffect>("card-play"),
-                Content.Load<SoundEffect>("card-restack")
+                Content.Load<SoundEffect>("card-restack"),
+                Content.Load<SoundEffect>("game-win")
             };
             
             dragonDrop = new DragonDrop<IDragonDropItem>(this, viewport);

@@ -751,3 +751,9 @@
 /processorParam:Quality=Best
 /build:card-restack.wav
 
+#begin game-win.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:game-win.wav
+

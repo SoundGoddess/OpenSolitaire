@@ -27,7 +27,11 @@ namespace OpenSolitaire.Classic {
         public Slot discardSlot { get; set; }
 
         private MouseState prevMouseState;
-        SoundEffect tableAnimationSound, cardParentSound, cardPlaySound, restackSound;
+        SoundEffect tableAnimationSound, cardParentSound, cardPlaySound, restackSound, winSound;
+
+        private double clickTimer;
+        private const double DELAY = 500;
+
 
         public TableClassic(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dd, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV, List<SoundEffect> soundFX)
             : base(spriteBatch, dd, cardBack, slotTex, stackOffsetH, stackOffsetV) {
@@ -36,6 +40,7 @@ namespace OpenSolitaire.Classic {
             cardParentSound = soundFX[1];
             cardPlaySound = soundFX[2];
             restackSound = soundFX[3];
+            winSound = soundFX[4];
 
             // create a fresh card deck
             drawPile = new Deck(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) { type = StackType.deck };
@@ -342,6 +347,59 @@ namespace OpenSolitaire.Classic {
                         }
 
                     }
+                    
+                    clickTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
+
+                    if (mouseState.LeftButton == ButtonState.Pressed &&
+                        prevMouseState.LeftButton == ButtonState.Released) {
+
+                        if (clickTimer < DELAY) {
+
+                            // check for double-click event
+                            foreach (var stack in stacks) {
+
+                                if (stack.Count > 0) { 
+                                    if (stack.type == StackType.stack || stack.type == StackType.discard) {
+
+                                        var topCard = stack.topCard();
+
+                                        if (topCard.Border.Contains(point) && topCard.Child == null) {
+
+                                            foreach (var playStack in stacks) {
+
+                                                if (playStack.type == StackType.play) {
+
+                                                    if (playStack.Count > 0) {
+
+                                                        var playStackTop = playStack.topCard();
+
+                                                        if (topCard.suit == playStackTop.suit && topCard.rank == playStackTop.rank + 1) {
+                                                            topCard.SetParent(playStackTop);
+                                                            cardPlaySound.Play();
+                                                        }
+                                                    }
+                                                    else if (topCard.rank == Rank._A) {
+                                                        topCard.MoveToEmptyStack(playStack);
+                                                        cardPlaySound.Play();
+                                                    }
+
+                                                }
+
+                                            }
+
+                                            Console.WriteLine("double-click: " + topCard.suit.ToString() + topCard.rank);
+                                        
+                                        }
+                                    }
+                                }
+
+                            }
+
+
+                        }
+                        clickTimer = 0;
+                    }
+
                     prevMouseState = mouseState;
                 }
             }
