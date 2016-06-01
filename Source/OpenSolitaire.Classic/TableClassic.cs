@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
 
 namespace OpenSolitaire.Classic {
     class TableClassic : Table {
@@ -26,9 +27,15 @@ namespace OpenSolitaire.Classic {
         public Slot discardSlot { get; set; }
 
         private MouseState prevMouseState;
+        SoundEffect tableAnimationSound, cardParentSound, cardPlaySound, restackSound;
 
-        public TableClassic(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dd, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV)
+        public TableClassic(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dd, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV, List<SoundEffect> soundFX)
             : base(spriteBatch, dd, cardBack, slotTex, stackOffsetH, stackOffsetV) {
+
+            tableAnimationSound = soundFX[0];
+            cardParentSound = soundFX[1];
+            cardPlaySound = soundFX[2];
+            restackSound = soundFX[3];
 
             // create a fresh card deck
             drawPile = new Deck(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) { type = StackType.deck };
@@ -112,7 +119,7 @@ namespace OpenSolitaire.Classic {
                     name = "Play " + i
                 };
 
-                AddStack(newSlot, StackType.play, StackMethod.normal);
+                AddStack(newSlot, StackType.play);
                 
             }
 
@@ -156,6 +163,7 @@ namespace OpenSolitaire.Classic {
 
             }
 
+            tableAnimationSound.Play();
 
             isSetup = true;
         }
@@ -174,7 +182,7 @@ namespace OpenSolitaire.Classic {
                 var card1 = (Card)sender;
                 var card2 = (Card)e.item;
                 
-                Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
+                //Console.WriteLine("??" + card1.suit.ToString() + card1.rank + " ?? " + card2.suit + card2.rank);
                 
                 if (card1.Position != card1.snapPosition) {
                     card = card1;
@@ -191,9 +199,16 @@ namespace OpenSolitaire.Classic {
 
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + destination.suit + destination.rank);
 
-                    if (destination.stack.type == StackType.play && card.suit == destination.suit) card.SetParent(destination);
+                    if (destination.stack.type == StackType.play && card.suit == destination.suit &&
+                        card.rank == destination.rank + 1) {
+                            card.SetParent(destination);
+                            cardPlaySound.Play();
+                    }
                     else if (destination.stack.type == StackType.stack && card.color != destination.color && 
-                        card.rank == destination.rank - 1) card.SetParent(destination);
+                        card.rank == destination.rank - 1) {
+                            card.SetParent(destination);
+                            cardParentSound.Play(.6f, 1f, 1f);
+                    }
 
                 }
 
@@ -204,14 +219,18 @@ namespace OpenSolitaire.Classic {
                 var slot = (Slot)e.item;
                 
 
-                Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
+                //Console.WriteLine("(debug) " + card.suit.ToString() + card.rank + " -> " + slot.stack.type);
 
                 if (slot.stack.Count == 0) {
 
-                    if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null)
+                    if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null) {
                         card.MoveToEmptyStack(slot.stack);
-                    if (slot.stack.type == StackType.stack && card.rank == Rank._K)
+                        cardPlaySound.Play();
+                    }
+                    if (slot.stack.type == StackType.stack && card.rank == Rank._K) {
                         card.MoveToEmptyStack(slot.stack);
+                        cardParentSound.Play(.6f, 1f, 1f);
+                    }
 
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + slot.stack.type);
                 }
@@ -292,6 +311,7 @@ namespace OpenSolitaire.Classic {
                                 card.snapPosition = card.Position;
                                 card.IsDraggable = true;
                                 discardPile.addCard(card);
+                                cardParentSound.Play(.6f, 1f, 1f);
 
                             }
                             else if (drawPile.Count == 0) {
@@ -309,7 +329,14 @@ namespace OpenSolitaire.Classic {
                                     drawPile.addCard(disCard);
 
                                 }
-
+                                if (drawPile.Count > 1) { 
+                                    var restackAnimation = drawPile.topCard();
+                                    restackAnimation.Position += new Vector2(stackOffsetHorizontal * 2,0);
+                                    restackAnimation.isSnapAnimating = true;
+                                    restackAnimation.snapSpeed = 3f;
+                                    restackSound.Play();
+                                }
+                                else cardParentSound.Play(.6f, 1f, 1f);
                             }
 
                         }

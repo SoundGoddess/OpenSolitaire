@@ -5,14 +5,13 @@
 * Assets licensed seperately (see LICENSE.md)
 */
 
-using System;
-using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Ruge.ViewportAdapters;
 using MonoGame.Ruge.DragonDrop;
-using MonoGame.Ruge.CardEngine;
 
 namespace OpenSolitaire.Classic {
     /// <summary>
@@ -20,8 +19,7 @@ namespace OpenSolitaire.Classic {
     /// </summary>
     public class OpenSolitaireClassic : Game {
 
-        private const string VERSION = "v 0.9.2";
-
+        private const string VERSION = "v 0.9.3";
 
         SpriteBatch spriteBatch;
 
@@ -43,6 +41,8 @@ namespace OpenSolitaire.Classic {
 
         private MouseState prevMouseState;
         private SpriteFont debugFont;
+
+        List<SoundEffect> soundFX;
 
 
         public OpenSolitaireClassic() {
@@ -90,11 +90,18 @@ namespace OpenSolitaire.Classic {
             debug = Content.Load<Texture2D>("debug");
             debugFont = Content.Load<SpriteFont>("Arial");
 
+            soundFX = new List<SoundEffect> {
+                Content.Load<SoundEffect>("table-animation"),
+                Content.Load<SoundEffect>("card-parent"),
+                Content.Load<SoundEffect>("card-play"),
+                Content.Load<SoundEffect>("card-restack")
+            };
+            
             dragonDrop = new DragonDrop<IDragonDropItem>(this, viewport);
 
 
             // table creates a fresh table.deck
-            table = new TableClassic(spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30);
+            table = new TableClassic(spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30, soundFX);
             
             // load up the card assets for the new deck
             foreach (var card in table.drawPile.cards) {
@@ -140,7 +147,8 @@ namespace OpenSolitaire.Classic {
 
                     newGameColor = Color.Aqua;
 
-                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+                    if (mouseState.LeftButton == ButtonState.Pressed 
+                        && prevMouseState.LeftButton == ButtonState.Released) {
 
                         table.NewGame();
 
@@ -204,9 +212,12 @@ namespace OpenSolitaire.Classic {
             spriteBatch.Draw(refreshMe, new Vector2(35, 50), Color.White);
 
 
+
             var versionSize = debugFont.MeasureString(VERSION);
             var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
             spriteBatch.DrawString(debugFont, VERSION, versionPos, Color.Black);
+         
+
 
 
 #if DEBUG

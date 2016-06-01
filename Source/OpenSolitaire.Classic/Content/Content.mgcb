@@ -727,3 +727,27 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
+#begin table-animation.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:table-animation.wav
+
+#begin card-parent.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:card-parent.wav
+
+#begin card-play.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:card-play.wav
+
+#begin card-restack.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:card-restack.wav
+

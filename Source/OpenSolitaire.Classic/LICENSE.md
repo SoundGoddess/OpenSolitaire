@@ -16,7 +16,7 @@ CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))
 
 [**Attribution-NonCommercial 4.0 International**](http://creativecommons.org/licenses/by-nc/4.0/)
 
-####To use my music for whatever you want (non-commercial), just link to [HathorsLove.com](http://HathorsLove.com/) somewhere obvious, so if someone wants to learn where the music came from they can find me easily.
+####To use my audio assets for whatever you want (non-commercial), just link to [HathorsLove.com](http://HathorsLove.com/) somewhere obvious, so if someone wants to learn where the music or sound effects came from they can find me easily.
 
 **Examples of non-commercial use:**
 
