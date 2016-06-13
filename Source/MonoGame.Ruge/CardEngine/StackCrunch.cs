@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿// Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+// Licensed under NWO-CS (see License.txt)
 
 namespace MonoGame.Ruge.CardEngine {
     public class StackCrunch {

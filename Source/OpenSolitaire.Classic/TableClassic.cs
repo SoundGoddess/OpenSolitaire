@@ -1,7 +1,7 @@
 ﻿/* ©2016 Hathor Gaia 
 * http://HathorsLove.com
 * 
-* Source code licensed under GPL-3
+* Source code licensed under NWO-SA
 * Assets licensed seperately (see LICENSE.md)
 */
 
@@ -12,13 +12,20 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.DragonDrop;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Microsoft.Xna.Framework.Audio;
+using MonoGame.Ruge.Glide;
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace OpenSolitaire.Classic {
     class TableClassic : Table {
 
         public bool isSetup = false;
         public bool isSnapAnimating = false;
+        
+        private int animationCount = 28;
+
         
         public Deck drawPile { get; set; }
         public Stack discardPile { get; set; }
@@ -33,8 +40,14 @@ namespace OpenSolitaire.Classic {
         private const double DELAY = 500;
 
 
-        public TableClassic(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dd, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV, List<SoundEffect> soundFX)
+        private Tweener tween = new Tweener();
+        private Game game;
+
+
+        public TableClassic(Game game, SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dd, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV, List<SoundEffect> soundFX)
             : base(spriteBatch, dd, cardBack, slotTex, stackOffsetH, stackOffsetV) {
+
+            this.game = game;
 
             tableAnimationSound = soundFX[0];
             cardParentSound = soundFX[1];
@@ -43,13 +56,17 @@ namespace OpenSolitaire.Classic {
             winSound = soundFX[4];
 
             // create a fresh card deck
-            drawPile = new Deck(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) { type = StackType.deck };
+            drawPile = new Deck(this, DeckType.playing, cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) { type = StackType.deck };
             drawPile.freshDeck();
-            
+
+            Tween.TweenerImpl.SetLerper<Vector2Lerper>(typeof(Vector2));
+
         }
 
 
         public void NewGame() {
+
+            animationCount = 28;
 
             foreach (var stack in stacks) {
                 foreach (var card in stack.cards) dragonDrop.Remove(card);
@@ -105,13 +122,14 @@ namespace OpenSolitaire.Classic {
             // set up second row of slots
             for (int i = 0; i < 7; i++) {
 
-                // add crunch for these stacks
                 var newSlot = new Slot(slotTex, spriteBatch) {
                     Position = new Vector2(x + x*i + slotTex.Width*i, y),
                     name = "Stack " + i
                 };
                 
                 var newStack = AddStack(newSlot, StackType.stack, StackMethod.vertical);
+
+                // add crunch for these stacks
                 newStack.crunchItems = 12;
 
             }
@@ -136,7 +154,8 @@ namespace OpenSolitaire.Classic {
 
         public new void SetTable() {
 
-            
+
+
             foreach (var card in drawPile.cards) {
                 card.Selected += OnCardSelected;
                 card.Collusion += OnCollusion;
@@ -149,38 +168,97 @@ namespace OpenSolitaire.Classic {
 
             for (var i = 0; i < 7; i++) {
 
-                var pos = new Vector2(x + x * i + slotTex.Width * i, y);
+                var newX = x + x * i + slotTex.Width * i;
+                var pos = new Vector2(newX, y);
                 var moveCard = drawPile.drawCard();
+                moveCard.Position = new Vector2(newX, 0 - moveCard.Texture.Height);
+
+                if (i == 0) {
+
+                    tween.Tween(moveCard, new { Position = pos }, 7, 40)
+                        .OnComplete(afterTween)
+                        .Ease(Ease.ElasticOut);
+
+                }
+                else {
+
+                    var delay = 3f + i * 2.5f;
+
+                    tween.Tween(moveCard, new {Position = pos}, 5, delay)
+                        .Ease(Ease.BackOut)
+                        .OnComplete(afterTween);
+                }
+                
                 moveCard.snapPosition = pos;
-                moveCard.isSnapAnimating = true;
-                moveCard.snapSpeed = 6.0f;
                 moveCard.IsDraggable = false;
+
                 stacks[i+2].addCard(moveCard);
 
+                
+
+                
                 for (var j = 1; j < i + 1; j++) {
 
                     moveCard = drawPile.drawCard();
                     moveCard.snapPosition = new Vector2(pos.X, pos.Y + stackOffsetVertical * j);
-                    moveCard.isSnapAnimating = true;
-                    moveCard.snapSpeed = 6.0f;
+                    moveCard.Position = new Vector2(newX, 0 - moveCard.Texture.Height);
+
+                    if (j == i) {
+                        tween.Tween(moveCard, new { Position = moveCard.snapPosition }, 7, 40)
+                            .OnComplete(afterTween)
+                            .Ease(Ease.ElasticOut);
+                    }
+                    else {
+
+                        var delay = 3f + i * 2.5f + j * 2.5f;
+
+                        tween.Tween(moveCard, new { Position = moveCard.snapPosition }, 5, delay)
+                            .Ease(Ease.BackOut)
+                            .OnComplete(afterTween);
+                    }
+                    
                     moveCard.IsDraggable = false;
                     stacks[i + 2].addCard(moveCard);
 
                 }
-
+                
 
             }
 
-            tableAnimationSound.Play();
+           // tableAnimationSound.Play();
 
             isSetup = true;
         }
 
+        private void afterTween() {
 
+            animationCount--;
+            cardPlaySound.Play();
 
+        }
+
+        private void afterTween(Card card, Card destinationCard, GameTime gameTime) {
+
+            card.isSnapAnimating = false;
+            card.SetParent(destinationCard);
+            cardPlaySound.Play();
+            animationCount = 0;
+            card.ZIndex -= ON_TOP;
+
+        }
+
+        private void afterTween(Card card, Stack stack, GameTime gameTime) {
+
+            card.isSnapAnimating = false;
+            card.MoveToEmptyStack(stack);
+            cardPlaySound.Play();
+            animationCount = 0;
+            card.ZIndex -= ON_TOP;
+            
+        }
+        
         private void OnCollusion(object sender, Card.CollusionEvent e) {
-
-
+            
             var type = e.item.GetType();
 
             if (type == typeof(Card)) {
@@ -208,21 +286,18 @@ namespace OpenSolitaire.Classic {
                     Console.WriteLine(card.suit.ToString() + card.rank + " -> " + destination.suit + destination.rank);
 
                     
-                    if (destination.stack.type == StackType.play && card.suit == destination.suit &&
-                        card.rank == destination.rank + 1) {
+                    if (destination.stack.type == StackType.play && Equals(card.suit, destination.suit) &&
+                        (PlayingRank)card.rank == (PlayingRank)destination.rank + 1) {
                         card.SetParent(destination);
                         cardPlaySound.Play();
                     }
                     else if (destination.stack.type == StackType.stack && card.color != destination.color &&
-                        card.rank == destination.rank - 1) {
+                        (PlayingRank)card.rank == (PlayingRank)destination.rank - 1) {
                         card.SetParent(destination);
                         cardParentSound.Play(.6f, 1f, 1f);
                     }
                     
-
-                    // todo: delete after testing
-                    //card.SetParent(destination);
-
+                    
                 }
 
             }
@@ -236,11 +311,11 @@ namespace OpenSolitaire.Classic {
 
                 if (slot.stack.Count == 0) {
 
-                    if (slot.stack.type == StackType.play && card.rank == Rank._A && card.Child == null) {
+                    if (slot.stack.type == StackType.play && Equals(card.rank, PlayingRank._A) && card.Child == null) {
                         card.MoveToEmptyStack(slot.stack);
                         cardPlaySound.Play();
                     }
-                    if (slot.stack.type == StackType.stack && card.rank == Rank._K) {
+                    if (slot.stack.type == StackType.stack && Equals(card.rank, PlayingRank._K)) {
                         card.MoveToEmptyStack(slot.stack);
                         cardParentSound.Play(.6f, 1f, 1f);
                     }
@@ -266,20 +341,22 @@ namespace OpenSolitaire.Classic {
 
         public new void Update(GameTime gameTime) {
 
-            if (isSetup) {
+            if (isSetup && game.IsActive) {
 
                 isSnapAnimating = false;
 
                 foreach (var stack in stacks) {
                     
                     foreach (var card in stack.cards) {
-                        if (card.isSnapAnimating) isSnapAnimating = true;
+                        if (card.isSnapAnimating) {
+                            isSnapAnimating = true;
+//                            card.Update(gameTime);
+                        }
                     }
-
                 }
 
 
-                if (!isSnapAnimating) {
+                if (!isSnapAnimating && (animationCount == 0)) {
 
 
                     foreach (var stack in stacks) {
@@ -291,7 +368,6 @@ namespace OpenSolitaire.Classic {
                                 if (!topCard.isFaceUp) {
                                     topCard.flipCard();
                                     topCard.IsDraggable = true;
-                                    topCard.snapSpeed = 25f;
                                     topCard.ZIndex = stack.Count;
                                 }
                             }
@@ -346,7 +422,6 @@ namespace OpenSolitaire.Classic {
                                     var restackAnimation = drawPile.topCard();
                                     restackAnimation.Position += new Vector2(stackOffsetHorizontal * 2,0);
                                     restackAnimation.isSnapAnimating = true;
-                                    restackAnimation.snapSpeed = 3f;
                                     restackSound.Play();
                                 }
                                 else cardParentSound.Play(.6f, 1f, 1f);
@@ -381,14 +456,32 @@ namespace OpenSolitaire.Classic {
 
                                                         var playStackTop = playStack.topCard();
 
-                                                        if (topCard.suit == playStackTop.suit && topCard.rank == playStackTop.rank + 1) {
-                                                            topCard.SetParent(playStackTop);
-                                                            cardPlaySound.Play();
+                                                        if (Equals(topCard.suit, playStackTop.suit) && (PlayingRank)topCard.rank == (PlayingRank)playStackTop.rank + 1) {
+
+                                                            Vector2 pos = playStackTop.Position;
+                                                            
+                                                            animationCount++;
+                                                            topCard.ZIndex += ON_TOP;
+
+                                                            tween.Tween(topCard, new { Position = pos }, 3)
+                                                                .Ease(Ease.QuartIn)
+                                                                .OnComplete(() => afterTween(topCard, playStackTop, gameTime));
+
+                                                            
                                                         }
                                                     }
-                                                    else if (topCard.rank == Rank._A) {
-                                                        topCard.MoveToEmptyStack(playStack);
-                                                        cardPlaySound.Play();
+                                                    else if (Equals(topCard.rank, PlayingRank._A)){
+
+                                                        Vector2 pos = playStack.slot.Position;
+
+                                                        animationCount++;
+                                                        topCard.ZIndex += ON_TOP;
+
+                                                        tween.Tween(topCard, new { Position = pos }, 3)
+                                                            .Ease(Ease.QuartIn)
+                                                            .OnComplete(() => afterTween(topCard, playStack, gameTime));
+
+                                                        
                                                     }
 
                                                 }
@@ -410,6 +503,8 @@ namespace OpenSolitaire.Classic {
 
                     prevMouseState = mouseState;
                 }
+
+                tween.Update(float.Parse(gameTime.ElapsedGameTime.Seconds + "." + gameTime.ElapsedGameTime.Milliseconds));
             }
 
             base.Update(gameTime);

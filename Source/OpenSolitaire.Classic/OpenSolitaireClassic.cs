@@ -1,11 +1,13 @@
 ﻿/* ©2016 Hathor Gaia 
 * http://HathorsLove.com
 * 
-* Source code licensed under GPL-3
+* Source code licensed under NWO-SA
 * Assets licensed seperately (see LICENSE.md)
 */
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +21,16 @@ namespace OpenSolitaire.Classic {
     /// </summary>
     public class OpenSolitaireClassic : Game {
 
-        private const string VERSION = "v 0.9.5";
+        MouseState oldMouse, currentMouse;
+        private bool click => currentMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released;
+        private bool unClick => currentMouse.LeftButton == ButtonState.Released && oldMouse.LeftButton == ButtonState.Pressed;
+
+        private string version = "v ";
+
+        // please only set this to true if you are contributing 
+        // your code back to the "official" repository:
+        // https://github.com/MetaSmug/RollYourOwnGameEngine
+        private bool isOfficial = true;
 
         SpriteBatch spriteBatch;
 
@@ -31,18 +42,17 @@ namespace OpenSolitaire.Classic {
         const int CARD_WIDTH = 125;
         const int CARD_HEIGHT = 156;
 
-        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug;
-        Rectangle newGameRect, debugRect;
-        Color newGameColor, debugColor;
+        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug, undo;
+        Rectangle newGameRect, debugRect, undoRect;
+        Color newGameColor, debugColor, undoColor;
 
         private TableClassic table;
 
         DragonDrop<IDragonDropItem> dragonDrop;
-
-        private MouseState prevMouseState;
+        
         private SpriteFont debugFont;
 
-        List<SoundEffect> soundFX;
+        private List<SoundEffect> soundFX;
 
 
         public OpenSolitaireClassic() {
@@ -54,10 +64,17 @@ namespace OpenSolitaire.Classic {
             graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
             graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
 
-            this.Window.Title = "Open Solitaire Classic";
-            this.Window.AllowUserResizing = true;
+            Window.Title = "Open Solitaire Classic";
+            Window.AllowUserResizing = true;
 
             IsMouseVisible = true;
+
+            version += FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            var subVersion = version.Substring(version.LastIndexOf(".") + 1);
+            if (subVersion == "0") version = version.Substring(0, version.LastIndexOf("."));
+            subVersion = version.Substring(version.LastIndexOf(".") + 1);
+            if (subVersion == "0") version = version.Substring(0, version.LastIndexOf("."));
+
         }
 
         /// <summary>
@@ -87,7 +104,8 @@ namespace OpenSolitaire.Classic {
             refreshMe = Content.Load<Texture2D>("refresh");
             newGame = Content.Load<Texture2D>("new_game");
             metaSmug = Content.Load<Texture2D>("smug-logo");
-            debug = Content.Load<Texture2D>("debug");
+            debug = Content.Load<Texture2D>("wrench");
+            undo = Content.Load<Texture2D>("undo");
             debugFont = Content.Load<SpriteFont>("Arial");
 
             soundFX = new List<SoundEffect> {
@@ -102,7 +120,7 @@ namespace OpenSolitaire.Classic {
 
 
             // table creates a fresh table.deck
-            table = new TableClassic(spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30, soundFX);
+            table = new TableClassic(this, spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30, soundFX);
             
             // load up the card assets for the new deck
             foreach (var card in table.drawPile.cards) {
@@ -132,24 +150,28 @@ namespace OpenSolitaire.Classic {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || 
+                Keyboard.GetState().IsKeyDown(Keys.Escape) ||
+                Keyboard.GetState().IsKeyDown(Keys.Q))
                 Exit();
 
-            var mouseState = Mouse.GetState();
-            var point = viewport.PointToScreen(mouseState.X, mouseState.Y);
+            currentMouse = Mouse.GetState();
+            
+            var point = viewport.PointToScreen(currentMouse.X, currentMouse.Y);
 
             newGameRect = new Rectangle(310, 20, newGame.Width, newGame.Height);
             newGameColor = Color.White;
 
+            undoRect = new Rectangle(310, 80, undo.Width, undo.Height);
+            undoColor = Color.White;
 
-            if (table.isSetup && !table.isSnapAnimating) {
+            if (IsActive && table.isSetup && !table.isSnapAnimating) {
 
                 if (newGameRect.Contains(point)) {
 
                     newGameColor = Color.Aqua;
 
-                    if (mouseState.LeftButton == ButtonState.Pressed 
-                        && prevMouseState.LeftButton == ButtonState.Released) {
+                    if (click) {
 
                         table.NewGame();
 
@@ -163,12 +185,26 @@ namespace OpenSolitaire.Classic {
                         }
 
                         table.SetTable();
-                        
+
                     }
+                    
                 }
 
+                if (undoRect.Contains(point)) {
+
+                    undoColor = Color.Aqua;
+                    if (click) {
+
+                     //   table = table.undoTable;
+
+                    }
+
+                }
+
+            }
+
 #if DEBUG
-                debugRect = new Rectangle(310, 80, newGame.Width, newGame.Height);
+                debugRect = new Rectangle(310, 140, debug.Width, debug.Height);
                 debugColor = Color.White;
 
 
@@ -176,16 +212,15 @@ namespace OpenSolitaire.Classic {
 
                     debugColor = Color.Aqua;
 
-                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released) {
+                    if (click) {
 
                         foreach (var stack in table.stacks) stack.debug();
 
                     }
                 }
 #endif
-            }
 
-            prevMouseState = mouseState;
+            oldMouse = currentMouse;
             
             table.Update(gameTime);
 
@@ -204,32 +239,33 @@ namespace OpenSolitaire.Classic {
 
             var logoVect = new Vector2(10, WINDOW_HEIGHT - metaSmug.Height - 10);
 
-            // todo: please comment out the line below if you're going to distribute the game
-            spriteBatch.Draw(metaSmug, logoVect, Color.White);
+            // only add the logo if contributing pull requests back to the "official" repository:
+            // https://github.com/SoundGoddess/OpenSolitaire
+            if (isOfficial) spriteBatch.Draw(metaSmug, logoVect, Color.White);
             
+ //           spriteBatch.Draw(undo, undoRect, undoColor);
             spriteBatch.Draw(newGame, newGameRect, newGameColor);
-
 
             spriteBatch.Draw(refreshMe, new Vector2(35, 50), Color.White);
 
 
 
-            var versionSize = debugFont.MeasureString(VERSION);
+            var versionSize = debugFont.MeasureString(version);
             var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
-            spriteBatch.DrawString(debugFont, VERSION, versionPos, Color.Black);
+            spriteBatch.DrawString(debugFont, version, versionPos, Color.Black);
          
 
 
 
 #if DEBUG
-
+            
             foreach (var stack in table.stacks) {
 
                 var slot = stack.slot;
                 var textWidth = debugFont.MeasureString(slot.name);
                 var textPos = new Vector2(slot.Position.X + slot.Texture.Width / 2 - textWidth.X / 2, slot.Position.Y - 16);
 
-                spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
+            //    spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
 
             }
 

@@ -159,6 +159,9 @@
     <None Include="OpenAL32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Content\undo.png" />
+    <Content Include="Content\wrench.png" />
+    <Content Include="OpenAL32.txt" />
     <Content Include="Spade.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

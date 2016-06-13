@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CardEngine\Card.cs" />
+    <Compile Include="CardEngine\CardType.cs" />
     <Compile Include="CardEngine\Deck.cs" />
     <Compile Include="CardEngine\Slot.cs" />
     <Compile Include="CardEngine\Stack.cs" />
@@ -61,7 +62,14 @@
     <Compile Include="DragonDrop\CollusionItem.cs" />
     <Compile Include="DragonDrop\DragonDrop.cs" />
     <Compile Include="DragonDrop\IDragonDropItem.cs" />
+    <Compile Include="Glide\Ease.cs" />
+    <Compile Include="Glide\GlideInfo.cs" />
+    <Compile Include="Glide\Lerper.cs" />
+    <Compile Include="Glide\Tween.cs" />
+    <Compile Include="Glide\Tweener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SillyFun\Confetti\Confetti.cs" />
+    <Compile Include="SillyFun\Confetti\ConfettiPiece.cs" />
     <Compile Include="Sprites\SpriteAnimator.cs" />
     <Compile Include="Sprites\SpriteGrid.cs" />
     <Compile Include="Sprites\SpriteRPG.cs" />
@@ -73,10 +81,12 @@
     <Compile Include="ViewportAdapters\WindowViewportAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Glide\license.txt" />
     <Content Include="License.txt" />
-    <Content Include="ViewportAdapters\viewports.txt" />
+    <Content Include="ViewportAdapters\license.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Glide\readme.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

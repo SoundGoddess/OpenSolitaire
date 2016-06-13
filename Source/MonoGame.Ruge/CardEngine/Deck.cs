@@ -1,8 +1,5 @@
-﻿/* 
-© 2016 The Ruge Project (http://ruge.metasmug.com/) 
-
-Licensed under MIT (see License.txt)
-
+﻿/* Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+ * Licensed under NWO-CS (see License.txt)
  */
 
 using System;
@@ -14,9 +11,12 @@ namespace MonoGame.Ruge.CardEngine {
 
     public class Deck : Stack {
 
-        public Deck(Texture2D cardBack, Texture2D slotTex, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) 
-            : base(cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) {
+        public DeckType deckType;
 
+        public Deck(Table table, DeckType deckType, Texture2D cardBack, Texture2D slotTex, SpriteBatch spriteBatch, int stackOffsetH, int stackOffsetV) 
+            : base(table, cardBack, slotTex, spriteBatch, stackOffsetH, stackOffsetV) {
+
+            this.deckType = deckType;
             type = StackType.deck;
 
         }
@@ -28,16 +28,28 @@ namespace MonoGame.Ruge.CardEngine {
 
             cards.Clear();
 
-            foreach (Suit mySuit in Enum.GetValues(typeof(Suit))) {
+            if (deckType == DeckType.hex)
+                foreach (HexSuit mySuit in Enum.GetValues(typeof(HexSuit)))
+                    foreach (HexRank myRank in Enum.GetValues(typeof(HexRank)))
+                        cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
+            
+            else if (deckType == DeckType.playing) 
+                foreach (PlayingSuit mySuit in Enum.GetValues(typeof(PlayingSuit)))
+                    foreach (PlayingRank myRank in Enum.GetValues(typeof(PlayingRank)))
+                        cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
 
-                foreach (Rank myRank in Enum.GetValues(typeof(Rank))) {
+            else if (deckType == DeckType.tarot) {
 
-                    cards.Add(new Card(myRank, mySuit, cardBack, spriteBatch));
-
+                foreach (TarotSuit mySuit in Enum.GetValues(typeof(TarotSuit))) {
+                    
+                    if (mySuit == TarotSuit.major)
+                        foreach (TarotRankMajor myRank in Enum.GetValues(typeof(TarotRankMajor)))
+                            cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
+                    else
+                        foreach (TarotRank myRank in Enum.GetValues(typeof(TarotRank)))
+                            cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
                 }
-
             }
-
         }
 
         /// <summary>
@@ -48,7 +60,7 @@ namespace MonoGame.Ruge.CardEngine {
 
             cards.Clear();
 
-            var subDeck = new Deck(cardBack, slot.Texture, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
+            var subDeck = new Deck(table, deckType, cardBack, slot.Texture, spriteBatch, stackOffsetHorizontal, stackOffsetVertical);
             subDeck.freshDeck();
             subDeck.shuffle();
 

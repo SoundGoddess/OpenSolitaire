@@ -1,9 +1,5 @@
-﻿/* 
-© 2016 The Ruge Project (http://ruge.metasmug.com/) 
-
-Licensed under MIT (see License.txt)
-
- */
+﻿// Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+// Licensed under NWO-CS (see License.txt)
 
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +20,7 @@ namespace MonoGame.Ruge.CardEngine {
         protected DragonDrop<IDragonDropItem> dragonDrop;
         
         public List<Stack> stacks = new List<Stack>();
+        private List<Stack> undoStacks = new List<Stack>();
 
         public Table(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
             this.spriteBatch = spriteBatch;
@@ -37,7 +34,7 @@ namespace MonoGame.Ruge.CardEngine {
 
         public Stack AddStack(Slot slot, StackType type = StackType.undefined, StackMethod stackMethod = StackMethod.normal) {
 
-            var stack = new Stack(cardBack, slotTex, spriteBatch, stackOffsetHorizontal, stackOffsetVertical) {
+            var stack = new Stack(this, cardBack, slotTex, spriteBatch, stackOffsetHorizontal, stackOffsetVertical) {
                 slot = slot,
                 method = stackMethod,
                 type = type
@@ -62,12 +59,6 @@ namespace MonoGame.Ruge.CardEngine {
             
         }
         
-
- //       public void MoveStack(Card card, Stack newStack) {
-            
-//            newStack.addCard(card);
-
-//        }
 
         /// <summary>
         /// I recommend only using this for debugging purposes, this is not an ideal way to do things
@@ -118,6 +109,25 @@ namespace MonoGame.Ruge.CardEngine {
         /// override this to clear the table
         /// </summary>
         public void Clear() { }
+
+        public void Save() {
+            
+            undoStacks.Clear();
+            
+            foreach (var stack in stacks) {
+
+
+                foreach (var card in stack.cards) {
+                    
+                    
+
+                }
+
+            }
+
+        }
+
+        public void Undo() => stacks = undoStacks.ToList();
 
 
         public void Update(GameTime gameTime) {

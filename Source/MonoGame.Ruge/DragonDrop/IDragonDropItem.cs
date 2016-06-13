@@ -1,10 +1,6 @@
-﻿/* 
-© 2016 The Ruge Project (http://ruge.metasmug.com/) 
+﻿// Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+// Licensed under NWO-CS (see License.txt)
 
-Licensed under MIT (see License.txt)
- 
- */
- 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
