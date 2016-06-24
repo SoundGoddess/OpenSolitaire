@@ -5,6 +5,8 @@ Classic Solitaire Game for Windows, Mac, and Linux
 
 ##Changelog
 
+**6/23/2016 -** Official 1.0 Release w/Bells & Whistles
+
 **5/30/2016 -** Finally got a working, bug-free build :D
 
 **5/28/2016 -** Released Alpha 2.  The game mostly works now, but there are some bugs to still squash and I want to add an undo feature before bringing it to release stage.
