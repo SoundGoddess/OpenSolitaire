@@ -20,7 +20,7 @@ namespace MonoGame.Ruge.CardEngine {
         protected DragonDrop<IDragonDropItem> dragonDrop;
         
         public List<Stack> stacks = new List<Stack>();
-        private List<Stack> undoStacks = new List<Stack>();
+        
 
         public Table(SpriteBatch spriteBatch, DragonDrop<IDragonDropItem> dragonDrop, Texture2D cardBack, Texture2D slotTex, int stackOffsetH, int stackOffsetV) {
             this.spriteBatch = spriteBatch;
@@ -109,26 +109,7 @@ namespace MonoGame.Ruge.CardEngine {
         /// override this to clear the table
         /// </summary>
         public void Clear() { }
-
-        public void Save() {
-            
-            undoStacks.Clear();
-            
-            foreach (var stack in stacks) {
-
-
-                foreach (var card in stack.cards) {
-                    
-                    
-
-                }
-
-            }
-
-        }
-
-        public void Undo() => stacks = undoStacks.ToList();
-
+        
 
         public void Update(GameTime gameTime) {
             foreach (var stack in stacks) stack.Update(gameTime);

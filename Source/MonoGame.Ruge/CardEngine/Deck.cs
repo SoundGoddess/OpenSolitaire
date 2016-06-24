@@ -38,6 +38,11 @@ namespace MonoGame.Ruge.CardEngine {
                     foreach (PlayingRank myRank in Enum.GetValues(typeof(PlayingRank)))
                         cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
 
+            else if (deckType == DeckType.friendly)
+                foreach (FriendlySuit mySuit in Enum.GetValues(typeof(FriendlySuit)))
+                    foreach (PlayingRank myRank in Enum.GetValues(typeof(PlayingRank)))
+                        cards.Add(new Card(deckType, mySuit, myRank, cardBack, spriteBatch));
+
             else if (deckType == DeckType.tarot) {
 
                 foreach (TarotSuit mySuit in Enum.GetValues(typeof(TarotSuit))) {

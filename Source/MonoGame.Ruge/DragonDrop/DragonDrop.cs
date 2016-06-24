@@ -38,7 +38,7 @@ namespace MonoGame.Ruge.DragonDrop {
         public void Add(T item) {
             dragItems.Add(item);
         }
-        public void Remove(T item) { dragItems.Remove(item); }
+        public void Remove(T item, GameTime gameTime) { dragItems.Remove(item); item.Update(gameTime); }
 
         public void Clear() {
             selectedItem = default(T);

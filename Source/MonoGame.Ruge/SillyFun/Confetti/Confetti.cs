@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Ruge.SillyFun.Confetti {
@@ -52,6 +53,13 @@ namespace MonoGame.Ruge.SillyFun.Confetti {
                             velocity * (float) Math.Cos(theta),
                             velocity * (float) Math.Sin(theta))
                     }));
+        }
+
+        public void Explode(int n, Vector2 atPosition, SoundEffect sound) {
+            
+            Explode(n, atPosition);
+            sound.Play();
+
         }
 
         private float randomScale() {

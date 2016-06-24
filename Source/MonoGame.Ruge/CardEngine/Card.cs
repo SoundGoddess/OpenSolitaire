@@ -10,6 +10,8 @@ using MonoGame.Ruge.Glide;
 
 namespace MonoGame.Ruge.CardEngine {
 
+    enum FlipState { none, flipIn, flipOut }
+
     public class Card : IDragonDropItem {
 
         // Z-Index constants
@@ -54,16 +56,25 @@ namespace MonoGame.Ruge.CardEngine {
         public Stack stack { get; set; }
         public int ZIndex { get; set; } = 1;
 
+        /*
+        private FlipState flipAnimating = FlipState.none;
+        private Rectangle flipRect;
+        private int flipWidth;
+        */
+
+        // animation stuff
         public bool isSnapAnimating = false;
         private bool startTween = true;
         public bool snap = true;
         public float snapTime = .7f;
+        
 
-   //     public Tweener tweenager = new Tweener();
+        // this seems hacky, need to come up with a better solution.
+        public bool render = true;
+
 
         public CardColor color {
             get {
-
 
                 if (cardType.deckType == DeckType.hex) {
 
@@ -85,6 +96,17 @@ namespace MonoGame.Ruge.CardEngine {
                             return CardColor.red;
                         default:
                             return CardColor.black;
+                    }
+                }
+                if (cardType.deckType == DeckType.friendly) {
+
+                    switch ((FriendlySuit)cardType.suit) {
+
+                        case FriendlySuit.carrots:
+                        case FriendlySuit.oranges:
+                            return CardColor.orange;
+                        default:
+                            return CardColor.red;
                     }
                 }
 
@@ -116,6 +138,11 @@ namespace MonoGame.Ruge.CardEngine {
 
         public void flipCard() {
             isFaceUp = !isFaceUp;
+            /*
+            flipAnimating = FlipState.flipIn;
+            flipWidth = texture.Width;
+            ZIndex += ON_TOP;
+            */
         }
 
 
@@ -159,7 +186,24 @@ namespace MonoGame.Ruge.CardEngine {
                 }
 
             }
-            
+            /*
+            if (flipAnimating == FlipState.flipIn) {
+                flipWidth--;
+                if (flipWidth == 0) {
+                    flipAnimating = FlipState.flipOut;
+                    isFaceUp = !isFaceUp;
+                }
+                flipRect = new Rectangle((int)Position.X, (int)Position.Y, flipWidth, texture.Height);
+            }
+            if (flipAnimating == FlipState.flipOut) {
+                flipWidth++;
+                if (flipWidth == texture.Width) {
+                    flipAnimating = FlipState.none;
+                    ZIndex -= ON_TOP;
+                }
+                flipRect = new Rectangle((int)Position.X, (int)Position.Y, flipWidth, texture.Height);
+            }
+            */
 
             tween.Update(float.Parse(gameTime.ElapsedGameTime.Seconds + "." + gameTime.ElapsedGameTime.Milliseconds));
 
@@ -177,14 +221,18 @@ namespace MonoGame.Ruge.CardEngine {
         }
 
         public void Draw(GameTime gameTime) {
-            spriteBatch.Draw(Texture, Position, Color.White);
+            /*if (flipAnimating != FlipState.none) spriteBatch.Draw(Texture, flipRect, Color.White);
+            else*/
+            
+            if (render) spriteBatch.Draw(Texture, Position, Color.White);
         }
 
         #endregion
 
         public void MoveToEmptyStack(Stack newStack) {
 
-            stack.table.Save();
+            var s = new SaveEvent { stack = stack };
+            Save?.Invoke(this, s);
 
             if (newStack.Count == 0) newStack.addCard(this, true);
 
@@ -193,8 +241,9 @@ namespace MonoGame.Ruge.CardEngine {
 
 
         public void SetParent(Card parent) {
-
-            stack.table.Save();
+            
+            var s = new SaveEvent { stack = stack };
+            Save?.Invoke(this, s);
             
             parent.Child = this;
             parent.stack.addCard(this, true);
@@ -241,6 +290,13 @@ namespace MonoGame.Ruge.CardEngine {
         public class CollusionEvent : EventArgs {
 
             public IDragonDropItem item { get; set; }
+
+        }
+
+        public event EventHandler<SaveEvent> Save;
+        public class SaveEvent : EventArgs {
+            
+            public Stack stack { get; set; }
 
         }
 

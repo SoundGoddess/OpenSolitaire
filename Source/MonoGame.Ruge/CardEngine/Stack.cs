@@ -53,7 +53,11 @@ namespace MonoGame.Ruge.CardEngine {
         public int Count => cards.Count;
 
         /// <summary>clears your card objects</summary>
-        public void Clear() => cards.Clear();
+        public void Clear() {
+            foreach (var card in cards) card.render = false; // hack for annoying issue
+            cards.Clear();
+        } 
+            
 
         // defining what type of stack it is
         public StackType type = StackType.hand;

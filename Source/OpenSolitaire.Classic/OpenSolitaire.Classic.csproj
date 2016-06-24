@@ -73,6 +73,11 @@
     <Compile Include="OpenSolitaireClassic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="TableClassic.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -92,75 +97,88 @@
     <Content Include="changelog.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\card-parent.wav" />
-    <Content Include="Content\card-restack.wav" />
-    <Content Include="Content\card_back_green.png" />
-    <Content Include="Content\card_back_purple.png" />
-    <Content Include="Content\card_slot.png" />
-    <Content Include="Content\clubs_10.png" />
-    <Content Include="Content\clubs_2.png" />
-    <Content Include="Content\clubs_3.png" />
-    <Content Include="Content\clubs_4.png" />
-    <Content Include="Content\clubs_5.png" />
-    <Content Include="Content\clubs_6.png" />
-    <Content Include="Content\clubs_7.png" />
-    <Content Include="Content\clubs_8.png" />
-    <Content Include="Content\clubs_9.png" />
-    <Content Include="Content\clubs_A.png" />
-    <Content Include="Content\clubs_J.png" />
-    <Content Include="Content\clubs_K.png" />
-    <Content Include="Content\clubs_Q.png" />
-    <Content Include="Content\debug.png" />
-    <Content Include="Content\diamonds_10.png" />
-    <Content Include="Content\diamonds_2.png" />
-    <Content Include="Content\diamonds_3.png" />
-    <Content Include="Content\diamonds_4.png" />
-    <Content Include="Content\diamonds_5.png" />
-    <Content Include="Content\diamonds_6.png" />
-    <Content Include="Content\diamonds_7.png" />
-    <Content Include="Content\diamonds_8.png" />
-    <Content Include="Content\diamonds_9.png" />
-    <Content Include="Content\diamonds_A.png" />
-    <Content Include="Content\diamonds_J.png" />
-    <Content Include="Content\diamonds_K.png" />
-    <Content Include="Content\diamonds_Q.png" />
-    <Content Include="Content\game-win.wav" />
-    <Content Include="Content\hearts_10.png" />
-    <Content Include="Content\hearts_2.png" />
-    <Content Include="Content\hearts_3.png" />
-    <Content Include="Content\hearts_4.png" />
-    <Content Include="Content\hearts_5.png" />
-    <Content Include="Content\hearts_6.png" />
-    <Content Include="Content\hearts_7.png" />
-    <Content Include="Content\hearts_8.png" />
-    <Content Include="Content\hearts_9.png" />
-    <Content Include="Content\hearts_A.png" />
-    <Content Include="Content\hearts_J.png" />
-    <Content Include="Content\hearts_K.png" />
-    <Content Include="Content\hearts_Q.png" />
-    <Content Include="Content\new_game.png" />
-    <Content Include="Content\refresh.png" />
-    <Content Include="Content\smug-logo.png" />
-    <Content Include="Content\Spade.ico" />
-    <Content Include="Content\spades_10.png" />
-    <Content Include="Content\spades_2.png" />
-    <Content Include="Content\spades_3.png" />
-    <Content Include="Content\spades_4.png" />
-    <Content Include="Content\spades_5.png" />
-    <Content Include="Content\spades_6.png" />
-    <Content Include="Content\spades_7.png" />
-    <Content Include="Content\spades_8.png" />
-    <Content Include="Content\spades_9.png" />
-    <Content Include="Content\spades_A.png" />
-    <Content Include="Content\spades_J.png" />
-    <Content Include="Content\spades_K.png" />
-    <Content Include="Content\spades_Q.png" />
-    <Content Include="Content\table-animation.wav" />
+    <Content Include="Content\audio\card-bounce.wav" />
+    <Content Include="Content\audio\card-kick.wav" />
+    <Content Include="Content\audio\card-parent.wav" />
+    <Content Include="Content\audio\card-play-old.wav" />
+    <Content Include="Content\audio\card-play.wav" />
+    <Content Include="Content\audio\card-restack.wav" />
+    <Content Include="Content\audio\card-undo.wav" />
+    <Content Include="Content\audio\pop.wav" />
+    <Content Include="Content\deck\card_back_green.png" />
+    <Content Include="Content\deck\card_back_purple.png" />
+    <Content Include="Content\deck\clubs_10.png" />
+    <Content Include="Content\deck\clubs_2.png" />
+    <Content Include="Content\deck\clubs_3.png" />
+    <Content Include="Content\deck\clubs_4.png" />
+    <Content Include="Content\deck\clubs_5.png" />
+    <Content Include="Content\deck\clubs_6.png" />
+    <Content Include="Content\deck\clubs_7.png" />
+    <Content Include="Content\deck\clubs_8.png" />
+    <Content Include="Content\deck\clubs_9.png" />
+    <Content Include="Content\deck\clubs_A.png" />
+    <Content Include="Content\deck\clubs_J.png" />
+    <Content Include="Content\deck\clubs_K.png" />
+    <Content Include="Content\deck\clubs_Q.png" />
+    <Content Include="Content\deck\diamonds_10.png" />
+    <Content Include="Content\deck\diamonds_2.png" />
+    <Content Include="Content\deck\diamonds_3.png" />
+    <Content Include="Content\deck\diamonds_4.png" />
+    <Content Include="Content\deck\diamonds_5.png" />
+    <Content Include="Content\deck\diamonds_6.png" />
+    <Content Include="Content\deck\diamonds_7.png" />
+    <Content Include="Content\deck\diamonds_8.png" />
+    <Content Include="Content\deck\diamonds_9.png" />
+    <Content Include="Content\deck\diamonds_A.png" />
+    <Content Include="Content\deck\diamonds_J.png" />
+    <Content Include="Content\deck\diamonds_K.png" />
+    <Content Include="Content\deck\diamonds_Q.png" />
+    <Content Include="Content\audio\game-win.wav" />
+    <Content Include="Content\deck\hearts_10.png" />
+    <Content Include="Content\deck\hearts_2.png" />
+    <Content Include="Content\deck\hearts_3.png" />
+    <Content Include="Content\deck\hearts_4.png" />
+    <Content Include="Content\deck\hearts_5.png" />
+    <Content Include="Content\deck\hearts_6.png" />
+    <Content Include="Content\deck\hearts_7.png" />
+    <Content Include="Content\deck\hearts_8.png" />
+    <Content Include="Content\deck\hearts_9.png" />
+    <Content Include="Content\deck\hearts_A.png" />
+    <Content Include="Content\deck\hearts_J.png" />
+    <Content Include="Content\deck\hearts_K.png" />
+    <Content Include="Content\deck\hearts_Q.png" />
+    <Content Include="Content\audio\logo-song.wav" />
+    <Content Include="Content\deck\spades_10.png" />
+    <Content Include="Content\deck\spades_2.png" />
+    <Content Include="Content\deck\spades_3.png" />
+    <Content Include="Content\deck\spades_4.png" />
+    <Content Include="Content\deck\spades_5.png" />
+    <Content Include="Content\deck\spades_6.png" />
+    <Content Include="Content\deck\spades_7.png" />
+    <Content Include="Content\deck\spades_8.png" />
+    <Content Include="Content\deck\spades_9.png" />
+    <Content Include="Content\deck\spades_A.png" />
+    <Content Include="Content\deck\spades_J.png" />
+    <Content Include="Content\deck\spades_K.png" />
+    <Content Include="Content\deck\spades_Q.png" />
+    <Content Include="Content\audio\table-animation.wav" />
+    <None Include="Content\ui\Arial.spritefont" />
     <None Include="OpenAL32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Content\undo.png" />
-    <Content Include="Content\wrench.png" />
+    <Content Include="Content\ui\card_slot.png" />
+    <Content Include="Content\ui\debug.png" />
+    <Content Include="Content\ui\new_game.png" />
+    <Content Include="Content\ui\overlay.png" />
+    <Content Include="Content\ui\paused.png" />
+    <Content Include="Content\ui\refresh.png" />
+    <Content Include="Content\ui\smug-color.png" />
+    <Content Include="Content\ui\smug-logo.png" />
+    <Content Include="Content\ui\solve.png" />
+    <Content Include="Content\ui\speaker-off.png" />
+    <Content Include="Content\ui\speaker.png" />
+    <Content Include="Content\ui\undo.png" />
+    <Content Include="Content\ui\wrench.png" />
     <Content Include="OpenAL32.txt" />
     <Content Include="Spade.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -168,13 +186,16 @@
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Content\Arial.spritefont" />
     <None Include="LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
