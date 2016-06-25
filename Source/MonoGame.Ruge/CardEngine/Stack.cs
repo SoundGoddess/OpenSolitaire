@@ -1,5 +1,6 @@
-﻿// Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
-// Licensed under NWO-CS (see License.txt)
+﻿/* Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+ * Unlicensed under NWO-CS (see UNLICENSE)
+ */
 
 using System;
 using System.Collections.Generic;
@@ -311,36 +312,36 @@ namespace MonoGame.Ruge.CardEngine {
 
 
         /// <summary>
-        /// spits out a bunch of debugging info to your console
+        /// spits out a bunch of debugging info to your Debug
         /// </summary>
         public void debug() {
 
-            Console.WriteLine("========");
-            Console.WriteLine(name);
+            Debug.WriteLine("========");
+            Debug.WriteLine(name);
 
             if (cards.Count > 0) {
 
                 Card top = topCard();
                 string strFaceUp = top.isFaceUp ? "face up" : "face down";
-                Console.WriteLine("top " + "z" + top.ZIndex.ToString("00") + ": " + top.rank + " of " + top.suit + " (" + strFaceUp + ")");
+                Debug.WriteLine("top " + "z" + top.ZIndex.ToString("00") + ": " + top.rank + " of " + top.suit + " (" + strFaceUp + ")");
 
 
                 foreach (var card in cards) {
 
                     strFaceUp = (card.isFaceUp ? "face up" : "face down");
-                    Console.Write("z" + card.ZIndex.ToString("00") + ": " + card.rank + " of " + card.suit + " (" + strFaceUp + ")");
-                    Console.Write(" - " + card.stack.name);
+                    Debug.Write("z" + card.ZIndex.ToString("00") + ": " + card.rank + " of " + card.suit + " (" + strFaceUp + ")");
+                    Debug.Write(" - " + card.stack.name);
 
                     if (card.Child != null) {
                         strFaceUp = (card.Child.isFaceUp ? "face up" : "face down");
-                        Console.Write(" -> z" + card.Child.ZIndex.ToString("00") + ": " +
+                        Debug.Write(" -> z" + card.Child.ZIndex.ToString("00") + ": " +
                         card.Child.rank + " of " + card.Child.suit + " (" + strFaceUp + ")");
                     }
 
-                    Console.WriteLine();
+                    Debug.WriteLine();
                 }
             }
-            else { Console.WriteLine("(empty stack)"); }
+            else { Debug.WriteLine("(empty stack)"); }
 
         }
 

@@ -1,9 +1,8 @@
-﻿/* ©2016 Hathor Gaia 
-* http://HathorsLove.com
-* 
-* Source code licensed under NWO-SA
-* Assets licensed seperately (see LICENSE.md)
-*/
+﻿/* Attribution (a) 2016 Hathor Gaia (http://HathorsLove.com)
+ * 
+ * Source code Unlicensed by NWO-CS (see UNLICENSE)
+ * Assets licensed seperately (see LICENSE.md)
+ */
 
 using System;
 using Microsoft.Xna.Framework;

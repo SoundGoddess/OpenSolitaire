@@ -1,10 +1,10 @@
-﻿/* Attribution (a) 2016 Hathor Gaia (http://HathorsLove.com)
- * 
- * Source code Unlicensed by NWO-CS (see UNLICENSE)
- * Assets licensed seperately (see LICENSE.md)
- */
+﻿/* ©2016 Hathor Gaia 
+* http://HathorsLove.com
+* 
+* Source code licensed under NWO-SA
+* Assets licensed seperately (see LICENSE.md)
+*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,7 +16,6 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Ruge.CardEngine;
 using MonoGame.Ruge.ViewportAdapters;
 using MonoGame.Ruge.DragonDrop;
-using MonoGame.Ruge.SillyFun.Confetti;
 
 namespace OpenSolitaire.Classic {
     /// <summary>
@@ -26,14 +25,10 @@ namespace OpenSolitaire.Classic {
 
         MouseState oldMouse, currentMouse;
         private bool click => currentMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released;
+        private bool unClick => currentMouse.LeftButton == ButtonState.Released && oldMouse.LeftButton == ButtonState.Pressed;
 
         private string version = "v ";
-
-        // please only set this to true if you are contributing 
-        // your code back to the "official" repository:
-        // https://github.com/MetaSmug/RollYourOwnGameEngine
-        private bool isOfficial = true;
-
+        
         SpriteBatch spriteBatch;
 
         BoxingViewportAdapter viewport;
@@ -44,9 +39,9 @@ namespace OpenSolitaire.Classic {
         const int CARD_WIDTH = 125;
         const int CARD_HEIGHT = 156;
 
-        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug, undo, solve, paused;
-        Rectangle newGameRect, debugRect, undoRect, solveRect;
-        Color newGameColor, debugColor, undoColor, solveColor;
+        Texture2D cardSlot, cardBack, refreshMe, newGame, metaSmug, debug, undo, speaker, speakerOff, overlay;
+        Rectangle newGameRect, debugRect, undoRect, speakerRect, overlayRect, solveRect;
+        Color newGameColor, debugColor, undoColor, speakerColor, solveColor;
 
         private TableClassic table;
 
@@ -65,9 +60,7 @@ namespace OpenSolitaire.Classic {
         private ResetableArray<Vector2> explosionPositions;
         private bool spawningConfetti = true;
         private SoundEffect popFX;
-
-        private SoundEffect gameWinFX;
-        private bool gameWinPlaying;
+        
 
         public OpenSolitaireClassic() {
             var graphics = new GraphicsDeviceManager(this);
@@ -111,6 +104,7 @@ namespace OpenSolitaire.Classic {
                         (1 - c) * GraphicsDevice.Viewport.Height);
                 }).ToArray());
 
+
             base.Initialize();
         }
 
@@ -129,10 +123,12 @@ namespace OpenSolitaire.Classic {
             newGame = Content.Load<Texture2D>("ui/new_game");
             metaSmug = Content.Load<Texture2D>("ui/smug-logo");
             debug = Content.Load<Texture2D>("ui/wrench");
-            undo = Content.Load<Texture2D>("ui/undo");
             solve = Content.Load<Texture2D>("ui/solve");
-            paused = Content.Load<Texture2D>("ui/paused");
+            speaker = Content.Load<Texture2D>("ui/speaker_on");
+            speakerOff = Content.Load<Texture2D>("ui/speaker_off");
+            undo = Content.Load<Texture2D>("ui/undo");
             debugFont = Content.Load<SpriteFont>("ui/Arial");
+            overlay = Content.Load<Texture2D>("ui/overlay");
 
             soundFX = new List<SoundEffect> {
                 Content.Load<SoundEffect>("audio/card-kick"),
@@ -140,6 +136,7 @@ namespace OpenSolitaire.Classic {
                 Content.Load<SoundEffect>("audio/card-play"),
                 Content.Load<SoundEffect>("audio/card-restack"),
                 Content.Load<SoundEffect>("audio/card-undo"),
+                Content.Load<SoundEffect>("audio/game-win"),
                 Content.Load<SoundEffect>("audio/card-bounce")
             };
 
@@ -147,17 +144,19 @@ namespace OpenSolitaire.Classic {
             popFX = Content.Load<SoundEffect>("audio/pop");
 
             dragonDrop = new DragonDrop<IDragonDropItem>(this, viewport);
-
-
+            
             // table creates a fresh table.deck
             table = new TableClassic(this, spriteBatch, dragonDrop, cardBack, cardSlot, 20, 30, soundFX);
 
             table.muteSound = Properties.Settings.Default.mute;
 
+
             // load up the card assets for the new deck
             foreach (var card in table.drawPile.cards) {
+
                 var location = "deck/" + card.suit + card.rank;
                 card.SetTexture(Content.Load<Texture2D>(location));
+
             }
 
             table.InitializeTable();
@@ -165,8 +164,8 @@ namespace OpenSolitaire.Classic {
             table.SetTable();
 
             Components.Add(dragonDrop);
-            
-            // more confetti stuff
+
+           // more confetti stuff
             var textures = new List<Color> {
                 new Color(255, 234, 142),
                 new Color(129, 232, 138),
@@ -201,17 +200,17 @@ namespace OpenSolitaire.Classic {
             newGameRect = new Rectangle(310, 20, newGame.Width, newGame.Height);
             newGameColor = Color.White;
 
-            undoRect = new Rectangle(310, 80, undo.Width, undo.Height);
+            undoRect = new Rectangle(310, 75, undo.Width, undo.Height);
             undoColor = Color.White;
-
             solveRect = new Rectangle(310, 75, solve.Width, solve.Height);
             solveColor = Color.White;
 
-            if (IsActive && table.isSetup && !table.isAnimating) {
 
+    if (table.isSetup && !table.isAnimating) {
+                
                 if (solveRect.Contains(point)) {
                     solveColor = Color.Aqua;
-                    if (table.gameState == GameState.complete && click) table.solve = true;
+                    if (!demo && table.gameState == GameState.complete && click) table.solve = true;
                 }
 
                 if (newGameRect.Contains(point)) {
@@ -220,42 +219,54 @@ namespace OpenSolitaire.Classic {
 
                     if (click) {
 
-                        gameWinPlaying = false;
+gameWinPlaying = false;
                         table.NewGame(gameTime);
-                        
+
+
+                        // load up the card assets for the new deck
                         foreach (var card in table.drawPile.cards) {
+
                             var location = "deck/" + card.suit + card.rank;
                             card.SetTexture(Content.Load<Texture2D>(location));
+
                         }
 
                         table.SetTable();
+
                     }
+                    
                 }
 
                 if (table.gameState == GameState.active && undoRect.Contains(point)) {
+
                     undoColor = Color.Aqua;
                     if (click) table.Undo(gameTime);
+
                 }
-                if (table.gameState == GameState.won && !gameWinPlaying) {
+               if (table.gameState == GameState.won && !gameWinPlaying) {
                     gameWinPlaying = true;
                     gameWinFX.Play();
                 }
+                
 
             }
 
-#if DEBUG
-                debugRect = new Rectangle(310, 140, debug.Width, debug.Height);
-                debugColor = Color.White;
-                if (debugRect.Contains(point)) {
-                    debugColor = Color.Aqua;
-                    if (click) foreach (var stack in table.stacks) stack.debug();
+            speakerRect = new Rectangle(360, 140, speaker.Width, speaker.Height);
+            speakerColor = Color.White;
+
+
+            if (speakerRect.Contains(point)) {
+
+                speakerColor = Color.Aqua;
+
+                if (click) {
+
+                    Properties.Settings.Default.mute = !Properties.Settings.Default.mute;
+                    Properties.Settings.Default.Save();
+
                 }
-#endif
-
-            oldMouse = currentMouse;
-            if (IsActive) table.Update(gameTime);
-
-            if (table.gameState == GameState.won && !table.isAnimating) {
+            }
+      if (table.gameState == GameState.won && !table.isAnimating) {
                 // final confetti stuff
                 if (transitionTimer.IsFinished(gameTime)) {
                     spawningConfetti = !spawningConfetti;
@@ -288,6 +299,28 @@ namespace OpenSolitaire.Classic {
                 explosionTimer.Reset(gameTime);
                 spawnTimer.Reset(gameTime);
             }
+        }
+
+#if DEBUG
+            debugRect = new Rectangle(410, 140, debug.Width, debug.Height);
+                debugColor = Color.White;
+
+
+                if (debugRect.Contains(point)) {
+
+                    debugColor = Color.Aqua;
+
+                    if (click) {
+
+                        foreach (var stack in table.stacks) stack.debug();
+
+                    }
+                }
+#endif
+
+            oldMouse = currentMouse;
+            
+            table.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -299,44 +332,50 @@ namespace OpenSolitaire.Classic {
         protected override void Draw(GameTime gameTime) {
 
             GraphicsDevice.Clear(Color.SandyBrown);
+
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix(), samplerState: SamplerState.LinearWrap);
 
-            if (!IsActive) {
-                var pausedRect = new Rectangle(WINDOW_WIDTH/2-paused.Width/2, WINDOW_HEIGHT/2-paused.Height/2, paused.Width, paused.Height);
-                spriteBatch.Draw(paused, pausedRect, Color.White);
-            }
-            else {
-                var logoVect = new Vector2(10, WINDOW_HEIGHT - metaSmug.Height - 10);
+            var logoVect = new Vector2(10, WINDOW_HEIGHT - metaSmug.Height - 10);
+            
+            spriteBatch.Draw(metaSmug, logoVect, Color.White);
+            
+            spriteBatch.Draw(undo, undoRect, undoColor);
+            spriteBatch.Draw(newGame, newGameRect, newGameColor);
 
-                // only add the logo if contributing pull requests back to the "official" repository:
-                // https://github.com/SoundGoddess/OpenSolitaire
-                if (isOfficial) spriteBatch.Draw(metaSmug, logoVect, Color.White);
+            spriteBatch.Draw(refreshMe, new Vector2(35, 50), Color.White);
 
-                if (table.gameState == GameState.complete) spriteBatch.Draw(solve, solveRect, solveColor);
-                else spriteBatch.Draw(undo, undoRect, undoColor);
 
-                spriteBatch.Draw(newGame, newGameRect, newGameColor);
-                spriteBatch.Draw(refreshMe, new Vector2(35, 50), Color.White);
 
-                var versionSize = debugFont.MeasureString(version);
-                var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
-                spriteBatch.DrawString(debugFont, version, versionPos, Color.Black);
-         
-    #if DEBUG
-                foreach (var stack in table.stacks) {
-                    var slot = stack.slot;
-                    var textWidth = debugFont.MeasureString(slot.name);
-                    var textPos = new Vector2(slot.Position.X + slot.Texture.Width / 2 - textWidth.X / 2, slot.Position.Y - 16);
-                //    spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
-                }
-                spriteBatch.Draw(debug, debugRect, debugColor);
-    #endif
-                
-                table.Draw(gameTime);
-                if (table.gameState == GameState.won) confetti.Draw(spriteBatch);
+            var versionSize = debugFont.MeasureString(version);
+            var versionPos = new Vector2(WINDOW_WIDTH - versionSize.X - 10, WINDOW_HEIGHT - versionSize.Y - 10);
+            spriteBatch.DrawString(debugFont, version, versionPos, Color.Black);
+            
+            var speakerTex = Properties.Settings.Default.mute ? speakerOff : speaker;
+            spriteBatch.Draw(speakerTex, speakerRect, speakerColor);
+
+
+
+
+#if DEBUG
+
+            foreach (var stack in table.stacks) {
+
+                var slot = stack.slot;
+                var textWidth = debugFont.MeasureString(slot.name);
+                var textPos = new Vector2(slot.Position.X + slot.Texture.Width / 2 - textWidth.X / 2, slot.Position.Y - 16);
+
+            //    spriteBatch.DrawString(debugFont, slot.name, textPos, Color.Black);
+
             }
 
+            spriteBatch.Draw(debug, debugRect, debugColor);
+#endif
+            
+            table.Draw(gameTime);
+            
+            
             spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

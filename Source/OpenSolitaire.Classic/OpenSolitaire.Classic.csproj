@@ -179,6 +179,7 @@
     <Content Include="Content\ui\speaker.png" />
     <Content Include="Content\ui\undo.png" />
     <Content Include="Content\ui\wrench.png" />
+    <None Include="UNLICENSE" />
     <Content Include="OpenAL32.txt" />
     <Content Include="Spade.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,5 +1,6 @@
-﻿// Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
-// Licensed under NWO-CS (see License.txt)
+﻿/* Attribution (a) 2016 The Ruge Project (http://ruge.metasmug.com/) 
+ * Unlicensed under NWO-CS (see UNLICENSE)
+ */
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

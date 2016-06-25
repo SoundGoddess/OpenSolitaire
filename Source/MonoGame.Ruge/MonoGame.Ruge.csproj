@@ -86,7 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Glide\license.txt" />
-    <Content Include="License.txt" />
+    <None Include="UNLICENSE" />
     <Content Include="ViewportAdapters\license.txt" />
   </ItemGroup>
   <ItemGroup>
