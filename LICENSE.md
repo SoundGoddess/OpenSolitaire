@@ -17,6 +17,6 @@ CC BY-SA 3.0 ([Cburnett](http://en.wikipedia.org/wiki/User:Cburnett))
 
 ###Audio and Music: 
 
-[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
+[Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](http://creativecommons.org/licenses/by-sa/4.0/)
 
 ####To use my music for whatever you want, just link to [HathorsLove.com](http://HathorsLove.com/) somewhere obvious, so if someone wants to learn where the music came from they can find me easily.
